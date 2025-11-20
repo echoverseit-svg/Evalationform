@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IGNITE Admin Dashboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+    :root {
+      --ignite-blue: #0b49c1;
+      --ignite-cyan: #01c8ef;
+      --ignite-dark: #0b1b3a;
+      --ignite-light: #f4f6fb;
+      --border-color: rgba(11, 73, 193, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, rgba(1, 200, 239, 0.08), rgba(11, 73, 193, 0.12));
+      color: #1b1b1b;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 18px 45px rgba(11, 27, 58, 0.12);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(120deg, var(--ignite-dark), var(--ignite-blue));
+      color: white;
+      padding: 2.75rem 3rem;
+    }
+
+    header h1 {
+      margin: 0 0 0.45rem;
+      font-size: clamp(2rem, 5vw, 2.6rem);
+    }
+
+    header p {
+      margin: 0.3rem 0;
+      opacity: 0.9;
+    }
+
+    main {
+      padding: 2.5rem 3rem 3rem;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    button,
+    .link-button {
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem 1.6rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--ignite-blue);
+      color: #fff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 20px rgba(11, 73, 193, 0.15);
+    }
+
+    .ghost {
+      background: transparent;
+      border: 2px solid var(--ignite-blue);
+      color: var(--ignite-blue);
+      box-shadow: none;
+    }
+
+    button:hover,
+    .link-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.3rem;
+      background: var(--ignite-light);
+    }
+
+    .stat-card span {
+      display: block;
+      font-size: 0.9rem;
+      color: #4f5366;
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-card strong {
+      font-size: 1.8rem;
+      color: var(--ignite-dark);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem 0.9rem;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #eef2ff;
+      color: var(--ignite-dark);
+      font-weight: 600;
+    }
+
+    tbody tr:hover {
+      background: rgba(11, 73, 193, 0.05);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .filters select,
+    .filters input {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.6rem 0.8rem;
+      font-family: inherit;
+    }
+
+    .notice {
+      padding: 1rem;
+      border-radius: 12px;
+      background: #fff7e6;
+      color: #7a5305;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(122, 83, 5, 0.25);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #5a5e70;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 720px) {
+      header, main {
+        padding: 2rem 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <p style="letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.85rem; color: rgba(255,255,255,0.7);">IGNITE Young Innovators' Congress</p>
+      <h1>Admin Control Center</h1>
+      <p>Monitor evaluation submissions, export data, and coordinate certificate releases.</p>
+      <div style="margin-top: 1.2rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a class="link-button ghost" href="IGNITE_Evaluation_Form.html">⬅ Back to Evaluation Form</a>
+        <button id="reAuth" class="ghost">Re-enter Admin Code</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="notice">All submissions shown here are stored locally in the browser (localStorage key<br /><code>igniteSubmissions</code>). Export regularly for archival purposes.</div>
+
+      <div class="toolbar">
+        <button id="refresh">Refresh Data</button>
+        <button id="export">Export CSV</button>
+        <button id="downloadJson">Download JSON Backup</button>
+        <button id="clear" style="background:#c62d2d;">Clear Stored Submissions</button>
+      </div>
+
+      <div class="filters">
+        <input type="search" id="search" placeholder="Search name, org, role..." />
+        <select id="dayFilter">
+          <option value="">All Days</option>
+          <option value="Day 1">Day 1 Only</option>
+          <option value="Day 2">Day 2 Only</option>
+          <option value="Day 1 & Day 2">Both Days</option>
+        </select>
+        <select id="recommendFilter">
+          <option value="">All Recommendations</option>
+          <option value="yes">Would recommend</option>
+          <option value="maybe">Maybe</option>
+          <option value="not-yet">Not yet</option>
+        </select>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><span>Total Submissions</span><strong id="totalSubmissions">0</strong></div>
+        <div class="stat-card"><span>Avg Overall Rating</span><strong id="avgOverall">0.00</strong></div>
+        <div class="stat-card"><span>Recommend Rate</span><strong id="recommendRate">0%</strong></div>
+        <div class="stat-card"><span>Latest Entry</span><strong id="latestEntry">—</strong></div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Organization</th>
+              <th>Role</th>
+              <th>Days Attended</th>
+              <th>Email</th>
+              <th>Overall</th>
+              <th>Recommend</th>
+              <th>Submitted</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="9" style="text-align:center; color:#7c7f91;">No data yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer>
+        Powered by JCI Antique Kruhay • Admin view refreshes from this device only.<br />
+        Need cloud sync? Consider hooking the form to Google Sheets or Supabase.
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const ADMIN_CODE = 'ignite2025';
+    const STORAGE_KEY = 'igniteSubmissions';
+
+    const totalSubmissionsEl = document.getElementById('totalSubmissions');
+    const avgOverallEl = document.getElementById('avgOverall');
+    const recommendRateEl = document.getElementById('recommendRate');
+    const latestEntryEl = document.getElementById('latestEntry');
+    const tableBody = document.getElementById('tableBody');
+    const searchInput = document.getElementById('search');
+    const dayFilter = document.getElementById('dayFilter');
+    const recommendFilter = document.getElementById('recommendFilter');
+
+    const refreshBtn = document.getElementById('refresh');
+    const exportBtn = document.getElementById('export');
+    const downloadJsonBtn = document.getElementById('downloadJson');
+    const clearBtn = document.getElementById('clear');
+    const reAuthBtn = document.getElementById('reAuth');
+
+    const requireAuth = () => {
+      const code = prompt('Enter admin access code:');
+      if (code !== ADMIN_CODE) {
+        alert('Invalid code. Redirecting back.');
+        window.location.href = 'IGNITE_Evaluation_Form.html';
+      }
+    };
+
+    const getSubmissions = () => {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch (error) {
+        console.error('Unable to read submissions', error);
+        return [];
+      }
+    };
+
+    const formatDateTime = (dateString) => {
+      if (!dateString) return '—';
+      const date = new Date(dateString);
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    };
+
+    const filterSubmissions = (entries) => {
+      const query = searchInput.value.trim().toLowerCase();
+      const day = dayFilter.value;
+      const recommend = recommendFilter.value;
+
+      return entries.filter((entry) => {
+        const matchesQuery = !query || Object.values(entry).some((value) =>
+          (value || '').toString().toLowerCase().includes(query)
+        );
+
+        const matchesDay = !day || (entry.days || '').includes(day);
+        const matchesRecommend = !recommend || entry.recommend === recommend;
+
+        return matchesQuery && matchesDay && matchesRecommend;
+      });
+    };
+
+    const renderTable = () => {
+      const submissions = getSubmissions();
+      const filtered = filterSubmissions(submissions);
+      if (!filtered.length) {
+        tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#7c7f91;">No matching submissions found.</td></tr>';
+      } else {
+        tableBody.innerHTML = filtered.map((entry, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${entry.name || '—'}</td>
+            <td>${entry.organization || '—'}</td>
+            <td>${entry.role || '—'}</td>
+            <td>${entry.days || '—'}</td>
+            <td>${entry.email || '—'}</td>
+            <td>${entry.overall || '—'}</td>
+            <td>${entry.recommend || '—'}</td>
+            <td>${formatDateTime(entry.submittedAt)}</td>
+          </tr>
+        `).join('');
+      }
+
+      totalSubmissionsEl.textContent = submissions.length;
+      const overallScores = submissions.map((entry) => Number(entry.overall)).filter(Boolean);
+      avgOverallEl.textContent = overallScores.length ? (overallScores.reduce((a, b) => a + b) / overallScores.length).toFixed(2) : '0.00';
+
+      const recommendYes = submissions.filter((entry) => entry.recommend === 'yes').length;
+      recommendRateEl.textContent = submissions.length ? `${Math.round((recommendYes / submissions.length) * 100)}%` : '0%';
+      latestEntryEl.textContent = submissions.length ? formatDateTime(submissions[submissions.length - 1].submittedAt) : '—';
+    };
+
+    const exportCsv = () => {
+      const submissions = getSubmissions();
+      if (!submissions.length) {
+        alert('No submissions to export.');
+        return;
+      }
+      const headers = ['Name', 'Organization', 'Role', 'Days', 'Email', 'Overall', 'Recommend', 'Submitted'];
+      const rows = submissions.map((entry) => headers.map((key) => {
+        const field = key.toLowerCase();
+        const value = entry[field] || entry[field.replace(' ', '')] || entry[field.replace(' ', '_')];
+        return `"${(value || '').toString().replace(/"/g, '""')}"`;
+      }));
+      const csv = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `IGNITE-Admin-Export-${Date.now()}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    };
+
+    const downloadJson = () => {
+      const submissions = getSubmissions();
+      if (!submissions.length) {
+        alert('No submissions to download.');
+        return;
+      }
+      const blob = new Blob([JSON.stringify(submissions, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `IGNITE-Admin-Backup-${Date.now()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    };
+
+    const clearSubmissions = () => {
+      if (confirm('This will delete all stored submissions for this browser. Continue?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderTable();
+      }
+    };
+
+    searchInput.addEventListener('input', renderTable);
+    dayFilter.addEventListener('change', renderTable);
+    recommendFilter.addEventListener('change', renderTable);
+    refreshBtn.addEventListener('click', renderTable);
+    exportBtn.addEventListener('click', exportCsv);
+    downloadJsonBtn.addEventListener('click', downloadJson);
+    clearBtn.addEventListener('click', clearSubmissions);
+    reAuthBtn.addEventListener('click', requireAuth);
+
+    requireAuth();
+    renderTable();
+  </script>
+</body>
+</html>

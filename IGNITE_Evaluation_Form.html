@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IGNITE Young Innovators' Congress | Evaluation Form</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+    :root {
+      --ignite-blue: #0b49c1;
+      --ignite-cyan: #01c8ef;
+      --ignite-dark: #0b1b3a;
+      --ignite-light: #f4f6fb;
+      --border-color: rgba(11, 73, 193, 0.15);
+    }
+
+    .certificate-shell {
+      margin-top: 3rem;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 2rem;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(1, 200, 239, 0.15));
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.4);
+    }
+
+    .certificate-card {
+      background: #fffefa;
+      border-radius: 16px;
+      border: 2px solid rgba(11, 73, 193, 0.3);
+      padding: 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background-image: url('https://your-supabase-storage-url.com/certificate-template.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .certificate-card::before,
+    .certificate-card::after {
+      content: '';
+      position: absolute;
+      border: 2px solid rgba(1, 200, 239, 0.3);
+      inset: 1rem;
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    .certificate-card h3 {
+      margin: 0;
+      font-size: 1.8rem;
+      letter-spacing: 0.2em;
+      color: var(--ignite-dark);
+      text-transform: uppercase;
+    }
+
+    .certificate-card h4 {
+      margin: 0.5rem 0 1.5rem;
+      font-size: 1.1rem;
+      color: var(--ignite-blue);
+      font-weight: 600;
+      letter-spacing: 0.2em;
+    }
+
+    .certificate-name {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700;
+      color: var(--ignite-blue);
+      margin: 1rem 0 0.25rem;
+    }
+
+    .certificate-body {
+      font-size: 1rem;
+      margin: 0.25rem 0;
+    }
+
+    .signature-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .signature-block {
+      flex: 1;
+      border-top: 2px solid rgba(11, 73, 193, 0.5);
+      padding-top: 0.4rem;
+    }
+
+    .certificate-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .certificate-actions button {
+      align-self: center;
+    }
+
+    .certificate-note {
+      font-size: 0.9rem;
+      color: #4f5366;
+      margin: 0.25rem 0 0;
+    }
+
+    .admin-shell {
+      margin-top: 3rem;
+      padding: 2rem;
+      border-radius: 18px;
+      border: 1px dashed rgba(11, 73, 193, 0.4);
+      background: #fefefe;
+    }
+
+    .admin-shell h2 {
+      margin-top: 0;
+      color: var(--ignite-dark);
+    }
+
+    .admin-controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .admin-controls button,
+    .ghost-button {
+      background: transparent;
+      border: 2px solid var(--ignite-blue);
+      color: var(--ignite-blue);
+      border-radius: 10px;
+      padding: 0.6rem 1.4rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .admin-controls button:hover,
+    .ghost-button:hover {
+      background: var(--ignite-blue);
+      color: #fff;
+    }
+
+    .admin-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.65rem 0.8rem;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .admin-table th {
+      background: var(--ignite-light);
+      color: var(--ignite-dark);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, rgba(1, 200, 239, 0.08), rgba(11, 73, 193, 0.12));
+      color: #1b1b1b;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(11, 27, 58, 0.12);
+      overflow: hidden;
+    }
+
+    header {
+      background: radial-gradient(circle at top left, rgba(1, 200, 239, 0.4), transparent 60%),
+        linear-gradient(120deg, var(--ignite-blue), var(--ignite-dark));
+      color: white;
+      padding: 2.5rem 3rem;
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      letter-spacing: 0.04em;
+    }
+
+    header p {
+      margin: 0.25rem 0;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    main {
+      padding: 2rem 3rem 3rem;
+    }
+
+    h2 {
+      color: var(--ignite-blue);
+      margin-top: 0;
+    }
+
+    section {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .legend {
+      background: var(--ignite-light);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.92rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .legend span {
+      font-weight: 600;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: #0b1b3a;
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      font-size: 0.96rem;
+      font-family: inherit;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .session-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.92rem;
+    }
+
+    .session-table thead {
+      background: var(--ignite-light);
+    }
+
+    .session-table th,
+    .session-table td {
+      padding: 0.85rem;
+      border: 1px solid var(--border-color);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .session-table select {
+      min-width: 90px;
+    }
+
+    .checkbox-group,
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+    }
+
+    .checkbox-group label,
+    .radio-group label {
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    fieldset {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 0 0 1.25rem;
+    }
+
+    fieldset legend {
+      padding: 0 0.5rem;
+      font-weight: 600;
+      color: var(--ignite-blue);
+    }
+
+    button {
+      align-self: flex-start;
+      background: linear-gradient(120deg, var(--ignite-blue), var(--ignite-cyan));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.95rem 2.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 12px 24px rgba(11, 73, 193, 0.2);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(11, 73, 193, 0.24);
+    }
+
+    @media (max-width: 720px) {
+      header, main {
+        padding: 2rem 1.25rem;
+      }
+
+      .session-table th:nth-child(3),
+      .session-table td:nth-child(3),
+      .session-table th:nth-child(4),
+      .session-table td:nth-child(4),
+      .session-table th:nth-child(5),
+      .session-table td:nth-child(5) {
+        white-space: nowrap;
+      }
+
+      .session-table td select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <p>November 21-22, 2025 • University of Antique, Main Campus • Sibalom, Antique</p>
+      <h1>IGNITE Young Innovators' Congress<br />Evaluation Form</h1>
+      <p><strong>Theme:</strong> Igniting Ideas &amp; Building the Ecosystem</p>
+      <p style="max-width: 600px; margin-top: 0.75rem; opacity: 0.85;">
+        Kindly complete this form at the end of each day. Your insights help JCI Antique Kruhay elevate the IGNITE experience for future innovators across Antique.
+      </p>
+    </header>
+
+    <main>
+      <form>
+        <section aria-labelledby="participant-info">
+          <h2 id="participant-info">A. Participant Information</h2>
+          <div class="input-grid">
+            <div>
+              <label for="name">Name / Alias</label>
+              <input type="text" id="name" name="name" placeholder="Optional" />
+            </div>
+            <div>
+              <label for="organization">Organization / School / Startup</label>
+              <input type="text" id="organization" name="organization" />
+            </div>
+            <div>
+              <label for="role">Role</label>
+              <select id="role" name="role">
+                <option value="">Select role</option>
+                <option>Student</option>
+                <option>Educator</option>
+                <option>Startup Founder</option>
+                <option>LGU Representative</option>
+                <option>NGO / Civic Leader</option>
+                <option>Industry / Private Sector</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label for="email">Contact Email (optional)</label>
+              <input type="email" id="email" name="email" placeholder="name@example.com" />
+            </div>
+          </div>
+          <div style="margin-top: 1rem;">
+            <label>Days Attended</label>
+            <div class="checkbox-group">
+              <label><input type="checkbox" name="days" value="day1" /> Day 1 (Nov 21)</label>
+              <label><input type="checkbox" name="days" value="day2" /> Day 2 (Nov 22)</label>
+              <label><input type="checkbox" name="days" value="both" /> Both Days</label>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="session-experience">
+          <h2 id="session-experience">B. Session Experience</h2>
+          <div class="legend">
+            <span>Rating Scale:</span>
+            <span>1 – Poor</span>
+            <span>2 – Fair</span>
+            <span>3 – Satisfactory</span>
+            <span>4 – Very Good</span>
+            <span>5 – Excellent</span>
+          </div>
+
+          <h3>Day 1 – November 21 (Friday)</h3>
+          <table class="session-table">
+            <thead>
+              <tr>
+                <th style="width: 12%;">Time</th>
+                <th>Program Segment</th>
+                <th>Relevance</th>
+                <th>Speaker Delivery</th>
+                <th>Engagement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>7:30 – 9:00 AM</td>
+                <td>Registration, Networking &amp; Opening Preliminaries (UA Chorale)</td>
+                <td><select name="d1_session1_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session1_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session1_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>9:00 – 9:30 AM</td>
+                <td>Welcome Program (JCI Antique Kruhay &amp; dignitaries)</td>
+                <td><select name="d1_session2_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session2_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session2_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>9:30 – 10:00 AM</td>
+                <td><em>Good Governance as the Engine of Local Innovation</em> – Hon. Lord Arnel L. Ruanto</td>
+                <td><select name="d1_session3_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session3_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session3_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>10:00 – 10:30 AM</td>
+                <td><em>Igniting Innovation, Empowering the Next Generation</em> – Mr. Matthew Cua</td>
+                <td><select name="d1_session4_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session4_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session4_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>10:30 – 11:50 AM</td>
+                <td>Moderated Open Forums &amp; Intermission Pieces</td>
+                <td><select name="d1_session5_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session5_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session5_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>11:00 – 11:30 AM</td>
+                <td><em>Your Place in the Start-up World</em> – Jose Francis V. Gerona</td>
+                <td><select name="d1_session6_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session6_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session6_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>11:50 – 1:30 PM</td>
+                <td>Certificates, Photo Ops, Lunch &amp; Energizer</td>
+                <td><select name="d1_session7_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session7_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session7_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>1:30 – 2:30 PM</td>
+                <td>Panel: <em>Igniting Ideas, Building Futures</em> (DepEd, DOST, DTI, Phil. Chamber)</td>
+                <td><select name="d1_session8_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session8_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session8_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>2:30 – 3:00 PM</td>
+                <td>Open Forum &amp; Certificate Presentations</td>
+                <td><select name="d1_session9_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session9_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session9_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Day 2 – November 22 (Saturday)</h3>
+          <table class="session-table">
+            <thead>
+              <tr>
+                <th style="width: 12%;">Time</th>
+                <th>Program Segment</th>
+                <th>Relevance</th>
+                <th>Facilitator Effectiveness</th>
+                <th>Engagement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>8:00 – 9:00 AM</td>
+                <td>Registration &amp; Networking</td>
+                <td><select name="d2_session1_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session1_facilitation"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session1_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>9:00 – 12:00 NN</td>
+                <td>IGNITE Innovators Challenge Competition</td>
+                <td><select name="d2_session2_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session2_facilitation"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session2_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>12:00 – 1:30 PM</td>
+                <td>Lunch, Energizer &amp; Networking</td>
+                <td><select name="d2_session3_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session3_facilitation"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session3_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>1:30 – 2:00 PM</td>
+                <td><em>Future Skills and Innovation</em> – Dr. Albert Remus R. Rosana</td>
+                <td><select name="d2_session4_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session4_facilitation"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session4_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>2:00 – 2:30 PM</td>
+                <td>Open Forum &amp; Certificates</td>
+                <td><select name="d2_session5_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session5_facilitation"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session5_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>2:30 – 5:00 PM</td>
+                <td>Closing Program &amp; Keynote: <em>From Spark to Movement</em> – Mr. Gleendo Dasmariñas</td>
+                <td><select name="d2_session6_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session6_facilitation"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session6_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>4:30 – 5:00 PM</td>
+                <td>Awarding Ceremony &amp; Closing Message – Shann Bryle Rubido</td>
+                <td><select name="d2_session7_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session7_facilitation"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d2_session7_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section aria-labelledby="event-summary">
+          <h2 id="event-summary">C. Event Experience Summary</h2>
+          <p>Please rate the following overall aspects of IGNITE.</p>
+          <div class="input-grid">
+            <div>
+              <label for="alignment">Alignment with the theme</label>
+              <select id="alignment" name="alignment"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div>
+              <label for="speakers">Quality &amp; diversity of speakers</label>
+              <select id="speakers" name="speakers"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div>
+              <label for="networking">Opportunities for networking &amp; collaboration</label>
+              <select id="networking" name="networking"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div>
+              <label for="takeaways">Practical takeaways</label>
+              <select id="takeaways" name="takeaways"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div>
+              <label for="venue">Venue &amp; technical arrangements</label>
+              <select id="venue" name="venue"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div>
+              <label for="logistics">Event logistics</label>
+              <select id="logistics" name="logistics"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div>
+              <label for="overall">Overall satisfaction</label>
+              <select id="overall" name="overall"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="impact follow">
+          <h2 id="impact follow">D. Impact &amp; Follow-through</h2>
+          <fieldset>
+            <legend>Top Insights</legend>
+            <label for="insight1">List up to three insights you plan to apply or share:</label>
+            <textarea id="insight1" name="insights" placeholder="1."></textarea>
+            <textarea name="insights" placeholder="2."></textarea>
+            <textarea name="insights" placeholder="3."></textarea>
+          </fieldset>
+          <fieldset>
+            <legend>Collaborations &amp; Recommendations</legend>
+            <label for="collab">People or organizations you connected with:</label>
+            <textarea id="collab" name="collab"></textarea>
+            <label>Would you recommend IGNITE to other innovators next year?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="recommend" value="yes" /> Yes</label>
+              <label><input type="radio" name="recommend" value="maybe" /> Maybe</label>
+              <label><input type="radio" name="recommend" value="not-yet" /> Not yet (please explain below)</label>
+            </div>
+            <label for="support">Areas where JCI Antique Kruhay can support you post-event:</label>
+            <textarea id="support" name="support" placeholder="e.g., mentorship, incubation, policy advocacy"></textarea>
+          </fieldset>
+        </section>
+
+        <section aria-labelledby="open-feedback">
+          <h2 id="open-feedback">E. Open Feedback</h2>
+          <label for="liked">What did you like most about this year’s congress?</label>
+          <textarea id="liked" name="liked"></textarea>
+          <label for="improve">What should we improve or add for the next IGNITE?</label>
+          <textarea id="improve" name="improve"></textarea>
+          <label for="comments">Additional comments, shout-outs, or testimonies:</label>
+          <textarea id="comments" name="comments"></textarea>
+        </section>
+
+        <button type="submit">Submit Feedback</button>
+      </form>
+      <p style="margin-top: 2rem; font-weight: 600; color: var(--ignite-dark);">Thank you for investing your time to help us ignite more ideas in Antique!</p>
+
+      <section id="certificate-section" class="certificate-shell" hidden>
+        <h2 style="margin-top: 0;">🎓 Instant Certificate of Participation</h2>
+        <p style="margin-bottom: 1.5rem;">A digital certificate will appear after you submit the evaluation. You can save it as an image for your records.</p>
+        <div class="certificate-card" id="certificateCard">
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 1.05rem; color: var(--ignite-dark);">JCI Antique Kruhay • IGNITE Young Innovators' Congress</strong>
+          </div>
+          <h3>Certificate</h3>
+          <h4>of Participation</h4>
+          <p class="certificate-body">This certifies that</p>
+          <p class="certificate-name" id="certificate-name">Participant Name</p>
+          <p class="certificate-body" id="certificate-org-line" style="min-height: 1.5rem;">&nbsp;</p>
+          <p class="certificate-body">actively engaged in the IGNITE Young Innovators' Congress</p>
+          <p class="certificate-body">held on <strong>November 21-22, 2025</strong> at the University of Antique, Main Campus.</p>
+          <p class="certificate-body" id="certificate-days">Attended: Day 1 &amp; Day 2</p>
+          <p class="certificate-body" style="margin-top: 1.25rem; font-size: 0.95rem;">Issued on <span id="certificate-issued">November 22, 2025</span></p>
+          <div class="signature-row">
+            <div class="signature-block">
+              <strong>Shann Bryle Rubido</strong><br />Director for Innovator, JCI Antique Kruhay
+            </div>
+            <div class="signature-block">
+              <strong>Gleendo Dasmariñas</strong><br />Head Trainer, JCI Philippines
+            </div>
+          </div>
+        </div>
+        <div class="certificate-actions">
+          <button type="button" id="downloadCertificate">Download Certificate (PNG)</button>
+          <p class="certificate-note">Tip: Use your complete name for the best-looking certificate.</p>
+        </div>
+      </section>
+
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <button type="button" class="ghost-button" id="adminAccess">Inline Admin Panel</button>
+        <a class="ghost-button" style="text-decoration:none; display:inline-flex; align-items:center;" href="IGNITE_Admin_Dashboard.html">Open Full Admin Dashboard ↗</a>
+      </div>
+
+      <section id="adminSection" class="admin-shell" hidden>
+        <h2>Admin Dashboard – Submission Overview</h2>
+        <p style="margin-top: -0.5rem; color: #4f5366;">Data is stored locally in this browser. Export regularly for backup.</p>
+        <div class="admin-controls">
+          <button type="button" id="refreshAdmin">Refresh List</button>
+          <button type="button" id="exportCsv">Export CSV</button>
+          <button type="button" id="clearData" style="border-color: #cc3b3b; color: #cc3b3b;">Clear Stored Submissions</button>
+        </div>
+        <div id="adminStats" style="margin-bottom: 1rem; font-weight: 600; color: var(--ignite-dark);"></div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Organization</th>
+                <th>Role</th>
+                <th>Days Attended</th>
+                <th>Overall Rating</th>
+                <th>Email</th>
+                <th>Submitted</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody">
+              <tr><td colspan="8" style="text-align:center; color:#6d6f7c;">No submissions yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha256-KqvOB0fOkH1ZZ1xd6QbaO5jM90+hCbGyF/F7fs/3GzQ=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.1/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const supabase = window.supabaseClient;
+    const supabaseEnabled = Boolean(supabase);
+    const LOCAL_STORAGE_KEY = 'igniteSubmissions';
+
+    const form = document.querySelector('form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const certificateSection = document.getElementById('certificate-section');
+    const certificateName = document.getElementById('certificate-name');
+    const certificateOrgLine = document.getElementById('certificate-org-line');
+    const certificateDays = document.getElementById('certificate-days');
+    const certificateIssued = document.getElementById('certificate-issued');
+    const downloadBtn = document.getElementById('downloadCertificate');
+    const certificateCard = document.getElementById('certificateCard');
+    const adminAccessBtn = document.getElementById('adminAccess');
+    const adminSection = document.getElementById('adminSection');
+    const adminTableBody = document.getElementById('adminTableBody');
+    const adminStats = document.getElementById('adminStats');
+    const refreshAdminBtn = document.getElementById('refreshAdmin');
+    const exportCsvBtn = document.getElementById('exportCsv');
+    const clearDataBtn = document.getElementById('clearData');
+
+    const ADMIN_CODE = 'ignite2025';
+    let cachedSubmissions = [];
+
+    const formatDate = (date) => date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const loadLocalSubmissions = () => {
+      if (cachedSubmissions.length) return cachedSubmissions;
+      try {
+        cachedSubmissions = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
+      } catch (error) {
+        console.warn('Unable to read local submissions', error);
+        cachedSubmissions = [];
+      }
+      return cachedSubmissions;
+    };
+
+    const saveLocalSubmission = (record) => {
+      const current = loadLocalSubmissions();
+      current.push(record);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(current));
+      cachedSubmissions = current;
+    };
+
+    const clearLocalSubmissions = () => {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      cachedSubmissions = [];
+    };
+
+    const renderAdminTable = () => {
+      if (!adminTableBody) return;
+      const submissions = loadLocalSubmissions();
+      if (!submissions.length) {
+        adminTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#6d6f7c;">No submissions stored in this browser yet.</td></tr>';
+        adminStats.textContent = 'Data is saved per device via localStorage.';
+        return;
+      }
+
+      adminTableBody.innerHTML = submissions.map((entry, index) => {
+        const date = new Date(entry.submittedAt);
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${entry.name || '—'}</td>
+            <td>${entry.organization || '—'}</td>
+            <td>${entry.role || '—'}</td>
+            <td>${entry.daysAttended || '—'}</td>
+            <td>${entry.overall || '—'}</td>
+            <td>${entry.email || '—'}</td>
+            <td>${formatDate(date)} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+          </tr>`;
+      }).join('');
+
+      const avgOverall = (
+        submissions
+          .map((entry) => Number(entry.overall))
+          .filter(Boolean)
+          .reduce((sum, value, _, arr) => sum + value / arr.length, 0)
+      ).toFixed(2);
+      adminStats.textContent = `Total submissions: ${submissions.length}${isNaN(avgOverall) ? '' : ` • Avg overall rating: ${avgOverall}`}`;
+    };
+
+    const exportCsv = () => {
+      const submissions = loadLocalSubmissions();
+      if (!submissions.length) return alert('No submissions available in this browser.');
+
+      const headers = ['Name', 'Organization', 'Role', 'Days', 'Email', 'Overall', 'Recommend', 'Submitted'];
+      const rows = submissions.map((entry) => [
+        entry.name,
+        entry.organization,
+        entry.role,
+        entry.daysAttended,
+        entry.email,
+        entry.overall,
+        entry.recommend,
+        entry.submittedAt,
+      ]);
+      const csvContent = [headers, ...rows]
+        .map((row) => row.map((value) => `"${(value || '').toString().replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `IGNITE-Submissions-${Date.now()}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    };
+
+    const supabaseTemplateUrl = 'certificates/IGNITE-template.png'; // relative path inside bucket
+    const certificateBackground = new Image();
+    let templateLoaded = false;
+
+    const syncSubmissionToSupabase = async (record) => {
+      if (!supabaseEnabled) return;
+      try {
+        await supabase.from('submissions').insert([
+          {
+            name: record.name,
+            organization: record.organization || null,
+            role: record.role || null,
+            email: record.email || null,
+            days_attended: record.daysAttended || null,
+            recommend: record.recommend || null,
+            overall: record.overall || null,
+            submitted_at: record.submittedAt,
+            payload: record.payload,
+          },
+        ]);
+      } catch (error) {
+        console.warn('Optional Supabase sync failed:', error.message);
+      }
+    };
+
+    const loadCertificateTemplate = async () => {
+      if (!supabaseEnabled) return;
+      try {
+        const { data, error } = await supabase.storage.from('assets').createSignedUrl(supabaseTemplateUrl, 60 * 60);
+        if (error) throw error;
+        certificateBackground.crossOrigin = 'anonymous';
+        certificateBackground.src = data.signedUrl;
+        certificateBackground.onload = () => {
+          templateLoaded = true;
+          certificateCard.style.backgroundImage = `url(${certificateBackground.src})`;
+          certificateCard.style.backgroundSize = 'cover';
+          certificateCard.style.backgroundPosition = 'center';
+          certificateCard.style.color = '#0b1b3a';
+        };
+      } catch (error) {
+        console.warn('Unable to load certificate template from Supabase Storage:', error.message);
+      }
+    };
+
+    loadCertificateTemplate();
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const organization = document.getElementById('organization').value.trim();
+      const daysSelected = Array.from(document.querySelectorAll('input[name="days"]:checked')).map((box) => box.value);
+
+      if (!name) {
+        alert('Please enter your name or alias so we can personalize your certificate.');
+        document.getElementById('name').focus();
+        return;
+      }
+
+      certificateName.textContent = name;
+      certificateOrgLine.textContent = organization ? `Representing ${organization}` : '\u00A0';
+
+      if (!daysSelected.length || daysSelected.includes('both') || daysSelected.length === 2) {
+        certificateDays.textContent = 'Attended: Day 1 & Day 2';
+      } else if (daysSelected.includes('day1')) {
+        certificateDays.textContent = 'Attended: Day 1 (November 21, 2025)';
+      } else if (daysSelected.includes('day2')) {
+        certificateDays.textContent = 'Attended: Day 2 (November 22, 2025)';
+      }
+
+      const submittedAt = new Date();
+      certificateIssued.textContent = formatDate(submittedAt);
+      certificateSection.hidden = false;
+      certificateSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      const formData = new FormData(form);
+      const payloadEntries = {};
+      formData.forEach((value, key) => {
+        if (payloadEntries[key]) {
+          payloadEntries[key] = [].concat(payloadEntries[key], value);
+        } else {
+          payloadEntries[key] = value;
+        }
+      });
+
+      const record = {
+        id: window.crypto?.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        name,
+        organization: organization || '',
+        role: formData.get('role') || '',
+        email: formData.get('email') || '',
+        daysAttended: certificateDays.textContent.replace('Attended: ', ''),
+        recommend: formData.get('recommend') || '',
+        overall: formData.get('overall') || '',
+        submittedAt: submittedAt.toISOString(),
+        payload: payloadEntries,
+      };
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving locally...';
+      }
+
+      saveLocalSubmission(record);
+      if (!adminSection.hidden) {
+        renderAdminTable();
+      }
+
+      await syncSubmissionToSupabase(record);
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Feedback';
+      }
+
+      form.reset();
+    });
+
+    downloadBtn.addEventListener('click', async () => {
+      if (certificateSection.hidden) {
+        alert('Please fill in and submit the form first to generate your certificate.');
+        return;
+      }
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = 'Preparing certificate...';
+      try {
+        const canvas = await html2canvas(certificateCard, { scale: 2 });
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        const safeName = certificateName.textContent.replace(/[^a-z0-9]+/gi, '-');
+        link.download = `IGNITE-Certificate-${safeName || 'Participant'}.png`;
+        link.href = image;
+        link.click();
+      } catch (error) {
+        console.error('Certificate download failed', error);
+        alert('Unable to generate the certificate image. Please try again.');
+      } finally {
+        downloadBtn.disabled = false;
+        downloadBtn.textContent = 'Download Certificate (PNG)';
+      }
+    });
+
+    const requestAdminAccess = () => {
+      const code = prompt('Enter admin access code:');
+      if (code === ADMIN_CODE) {
+        adminSection.hidden = false;
+        renderAdminTable();
+      } else if (code) {
+        alert('Invalid code. Please try again.');
+      }
+    };
+
+    adminAccessBtn.addEventListener('click', () => {
+      if (adminSection.hidden) {
+        requestAdminAccess();
+      } else {
+        adminSection.hidden = true;
+      }
+    });
+
+    refreshAdminBtn.addEventListener('click', renderAdminTable);
+    exportCsvBtn.addEventListener('click', exportCsv);
+    clearDataBtn.addEventListener('click', () => {
+      if (!confirm('This will erase all locally stored submissions for this browser. Continue?')) return;
+      clearLocalSubmissions();
+      renderAdminTable();
+    });
+  </script>
+</body>
+</html>
