@@ -25,69 +25,50 @@
     }
 
     .certificate-card {
-      background: #fffefa;
-      border-radius: 16px;
-      border: 2px solid rgba(11, 73, 193, 0.3);
-      padding: 2.5rem;
-      text-align: center;
       position: relative;
+      border-radius: 18px;
       overflow: hidden;
-      background-image: url('https://your-supabase-storage-url.com/certificate-template.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      padding: 0;
+      text-align: center;
+      background: #f1f4fb;
+      aspect-ratio: 1024 / 723;
+      max-width: 960px;
+      margin: 0 auto;
+      border: none;
+      box-shadow: 0 12px 35px rgba(11, 27, 58, 0.1);
     }
 
-    .certificate-card::before,
-    .certificate-card::after {
-      content: '';
+    .certificate-template {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .certificate-overlay {
       position: absolute;
-      border: 2px solid rgba(1, 200, 239, 0.3);
-      inset: 1rem;
-      border-radius: 12px;
+      inset: 0;
       pointer-events: none;
     }
 
-    .certificate-card h3 {
-      margin: 0;
-      font-size: 1.8rem;
-      letter-spacing: 0.2em;
-      color: var(--ignite-dark);
-      text-transform: uppercase;
-    }
-
-    .certificate-card h4 {
-      margin: 0.5rem 0 1.5rem;
-      font-size: 1.1rem;
-      color: var(--ignite-blue);
-      font-weight: 600;
-      letter-spacing: 0.2em;
-    }
-
     .certificate-name {
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      position: absolute;
+      top: 44%;
+      left: 60%;
+      transform: translate(-50%, -50%);
+      width: 58%;
+      text-align: center;
+      font-size: clamp(2.6rem, 4.6vw, 3.5rem);
       font-weight: 700;
-      color: var(--ignite-blue);
-      margin: 1rem 0 0.25rem;
+      color: #0000009d;
+      text-transform: none;
+      letter-spacing: 0.04em;
+      margin: 0;
     }
 
-    .certificate-body {
-      font-size: 1rem;
-      margin: 0.25rem 0;
-    }
-
-    .signature-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 1.5rem;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-    }
-
-    .signature-block {
-      flex: 1;
-      border-top: 2px solid rgba(11, 73, 193, 0.5);
-      padding-top: 0.4rem;
+    .certificate-heading,
+    .certificate-meta {
+      display: none !important;
     }
 
     .certificate-actions {
@@ -654,24 +635,14 @@
         <h2 style="margin-top: 0;">🎓 Instant Certificate of Participation</h2>
         <p style="margin-bottom: 1.5rem;">A digital certificate will appear after you submit the evaluation. You can save it as an image for your records.</p>
         <div class="certificate-card" id="certificateCard">
-          <div style="margin-bottom: 1rem;">
-            <strong style="font-size: 1.05rem; color: var(--ignite-dark);">JCI Antique Kruhay • IGNITE Young Innovators' Congress</strong>
-          </div>
-          <h3>Certificate</h3>
-          <h4>of Participation</h4>
-          <p class="certificate-body">This certifies that</p>
-          <p class="certificate-name" id="certificate-name">Participant Name</p>
-          <p class="certificate-body" id="certificate-org-line" style="min-height: 1.5rem;">&nbsp;</p>
-          <p class="certificate-body">actively engaged in the IGNITE Young Innovators' Congress</p>
-          <p class="certificate-body">held on <strong>November 21-22, 2025</strong> at the University of Antique, Main Campus.</p>
-          <p class="certificate-body" id="certificate-days">Attended: Day 1 &amp; Day 2</p>
-          <p class="certificate-body" style="margin-top: 1.25rem; font-size: 0.95rem;">Issued on <span id="certificate-issued">November 22, 2025</span></p>
-          <div class="signature-row">
-            <div class="signature-block">
-              <strong>Shann Bryle Rubido</strong><br />Director for Innovator, JCI Antique Kruhay
-            </div>
-            <div class="signature-block">
-              <strong>Gleendo Dasmariñas</strong><br />Head Trainer, JCI Philippines
+          <img id="certificateTemplate" class="certificate-template" src="" alt="IGNITE Certificate template" />
+          <div class="certificate-overlay">
+            <p class="certificate-heading">This certificate is awarded to</p>
+            <p class="certificate-name" id="certificate-name">Participant Name</p>
+            <div class="certificate-meta">
+              <p class="certificate-body" id="certificate-org-line">&nbsp;</p>
+              <p class="certificate-body" id="certificate-days">Attended: Day 1 &amp; Day 2</p>
+              <p class="certificate-issued">Issued on <span id="certificate-issued">November 22, 2025</span></p>
             </div>
           </div>
         </div>
@@ -718,7 +689,7 @@
     </main>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha256-KqvOB0fOkH1ZZ1xd6QbaO5jM90+hCbGyF/F7fs/3GzQ=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.1/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script>
@@ -831,7 +802,7 @@
       URL.revokeObjectURL(url);
     };
 
-    const supabaseTemplateUrl = 'certificates/IGNITE-template.png'; // relative path inside bucket
+    const supabaseTemplateUrl = 'ignite-certificate-green.png.png'; // update if you move/rename the file in Storage
     const certificateBackground = new Image();
     let templateLoaded = false;
 
@@ -857,19 +828,26 @@
     };
 
     const loadCertificateTemplate = async () => {
-      if (!supabaseEnabled) return;
+      if (!supabaseEnabled || !certificateCard) return;
       try {
         const { data, error } = await supabase.storage.from('assets').createSignedUrl(supabaseTemplateUrl, 60 * 60);
         if (error) throw error;
+
+        const signedUrl = data.signedUrl;
+        certificateCard.style.backgroundImage = `url(${signedUrl})`;
+        certificateCard.style.backgroundSize = 'cover';
+        certificateCard.style.backgroundPosition = 'center';
+        certificateCard.style.backgroundRepeat = 'no-repeat';
+        certificateCard.style.color = '#0b1b3a';
+
         certificateBackground.crossOrigin = 'anonymous';
-        certificateBackground.src = data.signedUrl;
         certificateBackground.onload = () => {
           templateLoaded = true;
-          certificateCard.style.backgroundImage = `url(${certificateBackground.src})`;
-          certificateCard.style.backgroundSize = 'cover';
-          certificateCard.style.backgroundPosition = 'center';
-          certificateCard.style.color = '#0b1b3a';
         };
+        certificateBackground.onerror = (event) => {
+          console.warn('Certificate template image failed to load:', event?.message || 'unknown error');
+        };
+        certificateBackground.src = signedUrl;
       } catch (error) {
         console.warn('Unable to load certificate template from Supabase Storage:', error.message);
       }
