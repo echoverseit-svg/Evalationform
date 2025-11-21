@@ -680,6 +680,7 @@
                 <th>Overall Rating</th>
                 <th>Email</th>
                 <th>Submitted</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="adminTableBody">
@@ -698,6 +699,18 @@
     const supabase = window.supabaseClient;
     const supabaseEnabled = Boolean(supabase);
     const LOCAL_STORAGE_KEY = 'igniteSubmissions';
+    const BASE_EXPORT_HEADERS = [
+      'submission_id',
+      'name',
+      'organization',
+      'role',
+      'email',
+      'days_attended',
+      'recommend',
+      'overall',
+      'submitted_at',
+      'submitted_at_local',
+    ];
 
     const form = document.querySelector('form');
     const submitBtn = form.querySelector('button[type="submit"]');
@@ -718,6 +731,7 @@
 
     const ADMIN_CODE = 'ignite2025';
     let cachedSubmissions = [];
+    let latestAdminDataset = [];
 
     const formatDate = (date) => date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -732,6 +746,78 @@
       return cachedSubmissions;
     };
 
+    const normalizeSubmission = (entry) => ({
+      ...entry,
+      daysAttended: entry?.daysAttended || entry?.days_attended || entry?.days || entry?.daysAttended || '—',
+      submittedAt: entry?.submittedAt || entry?.submitted_at || entry?.submittedAt,
+    });
+
+    const fetchSupabaseSubmissions = async () => {
+      if (!supabaseEnabled) return [];
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('id,name,organization,role,email,days_attended,recommend,overall,submitted_at,payload')
+        .order('submitted_at', { ascending: true });
+      if (error) throw error;
+      return data.map(normalizeSubmission);
+    };
+
+    const getAllSubmissions = async () => {
+      if (supabaseEnabled) {
+        try {
+          return await fetchSupabaseSubmissions();
+        } catch (error) {
+          console.warn('Unable to fetch submissions from Supabase', error);
+        }
+      }
+      return loadLocalSubmissions();
+    };
+
+    const formatSubmittedAt = (value) => {
+      if (!value) return '—';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '—';
+      return `${formatDate(date)} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    };
+
+    const stringifyPayloadValue = (value) => {
+      if (Array.isArray(value)) {
+        return value.map((item) => stringifyPayloadValue(item)).join(' | ');
+      }
+      if (value && typeof value === 'object') {
+        try {
+          return JSON.stringify(value);
+        } catch (error) {
+          return String(value);
+        }
+      }
+      return value ?? '';
+    };
+
+    const mapSubmissionToExportRow = (entry) => {
+      const baseRow = {
+        submission_id: entry.id || '',
+        name: entry.name || '',
+        organization: entry.organization || '',
+        role: entry.role || '',
+        email: entry.email || '',
+        days_attended: entry.daysAttended || '',
+        recommend: entry.recommend || '',
+        overall: entry.overall ?? '',
+        submitted_at: entry.submittedAt || '',
+        submitted_at_local: formatSubmittedAt(entry.submittedAt),
+      };
+
+      const payloadFields = {};
+      if (entry.payload && typeof entry.payload === 'object') {
+        Object.entries(entry.payload).forEach(([key, value]) => {
+          payloadFields[key] = stringifyPayloadValue(value);
+        });
+      }
+
+      return { ...baseRow, ...payloadFields };
+    };
+
     const saveLocalSubmission = (record) => {
       const current = loadLocalSubmissions();
       current.push(record);
@@ -744,18 +830,22 @@
       cachedSubmissions = [];
     };
 
-    const renderAdminTable = () => {
+    const renderAdminTable = async () => {
       if (!adminTableBody) return;
-      const submissions = loadLocalSubmissions();
+      adminTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#6d6f7c;">Loading submissions...</td></tr>';
+      adminStats.textContent = supabaseEnabled ? 'Fetching submissions from Supabase...' : 'Data is saved per device via localStorage.';
+
+      const submissions = await getAllSubmissions();
+      latestAdminDataset = submissions;
       if (!submissions.length) {
-        adminTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#6d6f7c;">No submissions stored in this browser yet.</td></tr>';
-        adminStats.textContent = 'Data is saved per device via localStorage.';
+        adminTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#6d6f7c;">No submissions available yet.</td></tr>';
+        adminStats.textContent = supabaseEnabled
+          ? 'No Supabase submissions found. Entries will appear once participants submit the form.'
+          : 'No local submissions stored yet.';
         return;
       }
 
-      adminTableBody.innerHTML = submissions.map((entry, index) => {
-        const date = new Date(entry.submittedAt);
-        return `
+      adminTableBody.innerHTML = submissions.map((entry, index) => `
           <tr>
             <td>${index + 1}</td>
             <td>${entry.name || '—'}</td>
@@ -764,42 +854,47 @@
             <td>${entry.daysAttended || '—'}</td>
             <td>${entry.overall || '—'}</td>
             <td>${entry.email || '—'}</td>
-            <td>${formatDate(date)} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-          </tr>`;
-      }).join('');
+            <td>${formatSubmittedAt(entry.submittedAt)}</td>
+            <td>
+              <button type="button" class="ghost-button admin-delete" data-entry-id="${entry.id}">Delete</button>
+            </td>
+          </tr>`).join('');
 
-      const avgOverall = (
-        submissions
-          .map((entry) => Number(entry.overall))
-          .filter(Boolean)
-          .reduce((sum, value, _, arr) => sum + value / arr.length, 0)
-      ).toFixed(2);
-      adminStats.textContent = `Total submissions: ${submissions.length}${isNaN(avgOverall) ? '' : ` • Avg overall rating: ${avgOverall}`}`;
+      const scores = submissions.map((entry) => Number(entry.overall)).filter((value) => !Number.isNaN(value) && value > 0);
+      const avgOverall = scores.length ? (scores.reduce((sum, value) => sum + value, 0) / scores.length).toFixed(2) : '—';
+      adminStats.textContent = `Total submissions: ${submissions.length}${avgOverall === '—' ? '' : ` • Avg overall rating: ${avgOverall}`}`;
     };
 
-    const exportCsv = () => {
-      const submissions = loadLocalSubmissions();
-      if (!submissions.length) return alert('No submissions available in this browser.');
+    const exportCsv = async () => {
+      const submissions = await getAllSubmissions();
+      if (!submissions.length) return alert('No submissions available to export.');
 
-      const headers = ['Name', 'Organization', 'Role', 'Days', 'Email', 'Overall', 'Recommend', 'Submitted'];
-      const rows = submissions.map((entry) => [
-        entry.name,
-        entry.organization,
-        entry.role,
-        entry.daysAttended,
-        entry.email,
-        entry.overall,
-        entry.recommend,
-        entry.submittedAt,
-      ]);
-      const csvContent = [headers, ...rows]
-        .map((row) => row.map((value) => `"${(value || '').toString().replace(/"/g, '""')}"`).join(','))
+      const flattenedRows = submissions.map(mapSubmissionToExportRow);
+      const payloadHeaders = new Set();
+      flattenedRows.forEach((row) => {
+        Object.keys(row).forEach((key) => {
+          if (!BASE_EXPORT_HEADERS.includes(key)) {
+            payloadHeaders.add(key);
+          }
+        });
+      });
+      const orderedHeaders = [...BASE_EXPORT_HEADERS, ...Array.from(payloadHeaders).sort()];
+
+      const csvContent = [orderedHeaders]
+        .concat(
+          flattenedRows.map((row) =>
+            orderedHeaders
+              .map((header) => `"${(row[header] ?? '').toString().replace(/"/g, '""')}"`)
+              .join(',')
+          )
+        )
         .join('\n');
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
+      const safeName = certificateName.textContent.replace(/[^a-z0-9]+/gi, '-');
+      link.download = `IGNITE-Submissions-${Date.Now ? Date.Now() : Date.now()}.csv`;
       link.href = url;
-      link.download = `IGNITE-Submissions-${Date.now()}.csv`;
       link.click();
       URL.revokeObjectURL(url);
     };
@@ -809,7 +904,7 @@
     let templateLoaded = false;
 
     const syncSubmissionToSupabase = async (record) => {
-      if (!supabaseEnabled) return;
+      if (!supabaseEnabled) return false;
       try {
         await supabase.from('submissions').insert([
           {
@@ -824,8 +919,10 @@
             payload: record.payload,
           },
         ]);
+        return true;
       } catch (error) {
-        console.warn('Optional Supabase sync failed:', error.message);
+        console.warn('Supabase sync failed:', error.message);
+        return false;
       }
     };
 
@@ -914,11 +1011,15 @@
       }
 
       saveLocalSubmission(record);
+
+      const synced = await syncSubmissionToSupabase(record);
+      if (!synced && supabaseEnabled) {
+        alert('We could not sync this response to Supabase. The data remains on this device only.');
+      }
+
       if (!adminSection.hidden) {
         renderAdminTable();
       }
-
-      await syncSubmissionToSupabase(record);
 
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -970,12 +1071,50 @@
       }
     });
 
-    refreshAdminBtn.addEventListener('click', renderAdminTable);
-    exportCsvBtn.addEventListener('click', exportCsv);
-    clearDataBtn.addEventListener('click', () => {
-      if (!confirm('This will erase all locally stored submissions for this browser. Continue?')) return;
+    refreshAdminBtn.addEventListener('click', () => {
+      renderAdminTable();
+    });
+    exportCsvBtn.addEventListener('click', () => {
+      exportCsv();
+    });
+    clearDataBtn.addEventListener('click', async () => {
+      if (!confirm('This will delete submissions from Supabase (if available) and clear the local cache for this browser. Continue?')) return;
+      if (supabaseEnabled) {
+        try {
+          await supabase.from('submissions').delete().neq('id', '');
+        } catch (error) {
+          alert(`Unable to clear Supabase submissions: ${error.message}`);
+          return;
+        }
+      }
       clearLocalSubmissions();
       renderAdminTable();
+    });
+
+    const deleteSubmission = async (entryId) => {
+      if (!entryId) return;
+      if (!confirm('Delete this submission? This cannot be undone.')) return;
+
+      if (supabaseEnabled) {
+        try {
+          await supabase.from('submissions').delete().eq('id', entryId);
+        } catch (error) {
+          alert(`Unable to delete from Supabase: ${error.message}`);
+          return;
+        }
+      }
+
+      cachedSubmissions = loadLocalSubmissions().filter((entry) => entry.id !== entryId);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cachedSubmissions));
+
+      latestAdminDataset = latestAdminDataset.filter((entry) => entry.id !== entryId);
+      renderAdminTable();
+    };
+
+    adminTableBody.addEventListener('click', (event) => {
+      const button = event.target.closest('button.admin-delete');
+      if (!button) return;
+      deleteSubmission(button.dataset.entryId);
     });
   </script>
 </body>

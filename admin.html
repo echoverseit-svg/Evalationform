@@ -120,6 +120,100 @@
       border: 1px solid var(--border-color);
     }
 
+    .detail-button {
+      border: 1px solid var(--ignite-blue);
+      background: transparent;
+      color: var(--ignite-blue);
+      padding: 0.35rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .detail-button:hover {
+      background: var(--ignite-blue);
+      color: #fff;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 24, 49, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 9999;
+    }
+
+    .modal[aria-hidden="false"] {
+      display: flex;
+    }
+
+    .modal-dialog {
+      background: #fff;
+      border-radius: 18px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 1.75rem;
+      box-shadow: 0 25px 55px rgba(11, 27, 58, 0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--ignite-dark);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .detail-card {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      background: #f9faff;
+    }
+
+    .detail-card h4 {
+      margin: 0 0 0.65rem;
+      font-size: 0.95rem;
+      color: var(--ignite-dark);
+    }
+
+    .detail-card dl {
+      margin: 0;
+    }
+
+    .detail-card dt {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #4c4f63;
+    }
+
+    .detail-card dd {
+      margin: 0 0 0.5rem;
+      font-size: 0.9rem;
+      color: #1e2130;
+      white-space: pre-wrap;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -189,13 +283,13 @@
       <h1>Admin Control Center</h1>
       <p>Monitor evaluation submissions, export data, and coordinate certificate releases.</p>
       <div style="margin-top: 1.2rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a class="link-button ghost" href="IGNITE_Evaluation_Form.html">⬅ Back to Evaluation Form</a>
+        <a class="link-button ghost" href="index.html">⬅ Back to Evaluation Form</a>
         <button id="reAuth" class="ghost">Re-enter Admin Code</button>
       </div>
     </header>
 
     <main>
-      <div class="notice">All submissions shown here are stored locally in the browser (localStorage key<br /><code>igniteSubmissions</code>). Export regularly for archival purposes.</div>
+      <div class="notice">Submissions pull from Supabase when available (falls back to this browser). Export regularly for archival purposes.</div>
 
       <div class="toolbar">
         <button id="refresh">Refresh Data</button>
@@ -240,10 +334,12 @@
               <th>Overall</th>
               <th>Recommend</th>
               <th>Submitted</th>
+              <th>Details</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="9" style="text-align:center; color:#7c7f91;">No data yet.</td></tr>
+            <tr><td colspan="10" style="text-align:center; color:#7c7f91;">No data yet.</td></tr>
           </tbody>
         </table>
       </div>
@@ -255,9 +351,39 @@
     </main>
   </div>
 
+  <div class="modal" id="detailModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h3 id="detailModalTitle" style="margin:0;">Submission Details</h3>
+          <p id="detailModalMeta" style="margin:0.35rem 0 0; font-size:0.9rem; color:#4c4f63;"></p>
+        </div>
+        <button class="modal-close" id="detailModalClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="detail-grid" id="detailModalContent"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.1/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
   <script>
     const ADMIN_CODE = 'ignite2025';
     const STORAGE_KEY = 'igniteSubmissions';
+    const BASE_EXPORT_HEADERS = [
+      'submission_id',
+      'name',
+      'organization',
+      'role',
+      'email',
+      'days_attended',
+      'recommend',
+      'overall',
+      'submitted_at',
+      'submitted_at_local',
+    ];
+
+    const supabase = window.supabaseClient;
+    const supabaseEnabled = Boolean(supabase);
 
     const totalSubmissionsEl = document.getElementById('totalSubmissions');
     const avgOverallEl = document.getElementById('avgOverall');
@@ -267,6 +393,11 @@
     const searchInput = document.getElementById('search');
     const dayFilter = document.getElementById('dayFilter');
     const recommendFilter = document.getElementById('recommendFilter');
+    const detailModal = document.getElementById('detailModal');
+    const detailModalTitle = document.getElementById('detailModalTitle');
+    const detailModalMeta = document.getElementById('detailModalMeta');
+    const detailModalContent = document.getElementById('detailModalContent');
+    const detailModalClose = document.getElementById('detailModalClose');
 
     const refreshBtn = document.getElementById('refresh');
     const exportBtn = document.getElementById('export');
@@ -282,19 +413,94 @@
       }
     };
 
-    const getSubmissions = () => {
+    let cachedLocalSubmissions = [];
+    let latestDataset = [];
+
+    const loadLocalSubmissions = () => {
+      if (cachedLocalSubmissions.length) return cachedLocalSubmissions;
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        cachedLocalSubmissions = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
       } catch (error) {
         console.error('Unable to read submissions', error);
-        return [];
+        cachedLocalSubmissions = [];
       }
+      return cachedLocalSubmissions;
     };
 
-    const formatDateTime = (dateString) => {
-      if (!dateString) return '—';
-      const date = new Date(dateString);
+    const normalizeSubmission = (entry) => ({
+      ...entry,
+      daysAttended: entry?.daysAttended || entry?.days_attended || entry?.days || '—',
+      submittedAt: entry?.submittedAt || entry?.submitted_at || entry?.submittedAt,
+    });
+
+    const fetchSupabaseSubmissions = async () => {
+      if (!supabaseEnabled) return [];
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('id,name,organization,role,email,days_attended,recommend,overall,submitted_at,payload')
+        .order('submitted_at', { ascending: true });
+      if (error) throw error;
+      return data.map(normalizeSubmission);
+    };
+
+    const getSubmissions = async () => {
+      if (supabaseEnabled) {
+        try {
+          const supabaseRows = await fetchSupabaseSubmissions();
+          latestDataset = supabaseRows;
+          return supabaseRows;
+        } catch (error) {
+          console.warn('Unable to fetch submissions from Supabase', error);
+        }
+      }
+      const localRows = loadLocalSubmissions();
+      latestDataset = localRows;
+      return localRows;
+    };
+
+    const formatDateTime = (value) => {
+      if (!value) return '—';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '—';
       return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    };
+
+    const stringifyPayloadValue = (value) => {
+      if (Array.isArray(value)) {
+        return value.map((item) => stringifyPayloadValue(item)).join(' | ');
+      }
+      if (value && typeof value === 'object') {
+        try {
+          return JSON.stringify(value);
+        } catch (error) {
+          return String(value);
+        }
+      }
+      return value ?? '';
+    };
+
+    const mapSubmissionToExportRow = (entry) => {
+      const baseRow = {
+        submission_id: entry.id || '',
+        name: entry.name || '',
+        organization: entry.organization || '',
+        role: entry.role || '',
+        email: entry.email || '',
+        days_attended: entry.daysAttended || '',
+        recommend: entry.recommend || '',
+        overall: entry.overall ?? '',
+        submitted_at: entry.submittedAt || '',
+        submitted_at_local: formatDateTime(entry.submittedAt),
+      };
+
+      const payloadFields = {};
+      if (entry.payload && typeof entry.payload === 'object') {
+        Object.entries(entry.payload).forEach(([key, value]) => {
+          payloadFields[key] = stringifyPayloadValue(value);
+        });
+      }
+
+      return { ...baseRow, ...payloadFields };
     };
 
     const filterSubmissions = (entries) => {
@@ -307,18 +513,25 @@
           (value || '').toString().toLowerCase().includes(query)
         );
 
-        const matchesDay = !day || (entry.days || '').includes(day);
+        const entryDays = entry.daysAttended || entry.days || '';
+        const matchesDay = !day || entryDays.includes(day);
         const matchesRecommend = !recommend || entry.recommend === recommend;
 
         return matchesQuery && matchesDay && matchesRecommend;
       });
     };
 
-    const renderTable = () => {
-      const submissions = getSubmissions();
+    const renderTable = async () => {
+      tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:#7c7f91;">Loading submissions...</td></tr>';
+      totalSubmissionsEl.textContent = '—';
+      avgOverallEl.textContent = '—';
+      recommendRateEl.textContent = '—';
+      latestEntryEl.textContent = '—';
+
+      const submissions = await getSubmissions();
       const filtered = filterSubmissions(submissions);
       if (!filtered.length) {
-        tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:#7c7f91;">No matching submissions found.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:#7c7f91;">No matching submissions found.</td></tr>';
       } else {
         tableBody.innerHTML = filtered.map((entry, index) => `
           <tr>
@@ -326,11 +539,13 @@
             <td>${entry.name || '—'}</td>
             <td>${entry.organization || '—'}</td>
             <td>${entry.role || '—'}</td>
-            <td>${entry.days || '—'}</td>
+            <td>${entry.daysAttended || entry.days || '—'}</td>
             <td>${entry.email || '—'}</td>
             <td>${entry.overall || '—'}</td>
             <td>${entry.recommend || '—'}</td>
             <td>${formatDateTime(entry.submittedAt)}</td>
+            <td><button class="detail-button" data-entry-id="${entry.id}">View</button></td>
+            <td><button class="detail-button" data-delete-id="${entry.id}" style="border-color:#c62d2d; color:#c62d2d;">Delete</button></td>
           </tr>
         `).join('');
       }
@@ -344,19 +559,33 @@
       latestEntryEl.textContent = submissions.length ? formatDateTime(submissions[submissions.length - 1].submittedAt) : '—';
     };
 
-    const exportCsv = () => {
-      const submissions = getSubmissions();
+    const exportCsv = async () => {
+      const submissions = await getSubmissions();
       if (!submissions.length) {
         alert('No submissions to export.');
         return;
       }
-      const headers = ['Name', 'Organization', 'Role', 'Days', 'Email', 'Overall', 'Recommend', 'Submitted'];
-      const rows = submissions.map((entry) => headers.map((key) => {
-        const field = key.toLowerCase();
-        const value = entry[field] || entry[field.replace(' ', '')] || entry[field.replace(' ', '_')];
-        return `"${(value || '').toString().replace(/"/g, '""')}"`;
-      }));
-      const csv = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+
+      const flattenedRows = submissions.map(mapSubmissionToExportRow);
+      const payloadHeaders = new Set();
+      flattenedRows.forEach((row) => {
+        Object.keys(row).forEach((key) => {
+          if (!BASE_EXPORT_HEADERS.includes(key)) {
+            payloadHeaders.add(key);
+          }
+        });
+      });
+      const orderedHeaders = [...BASE_EXPORT_HEADERS, ...Array.from(payloadHeaders).sort()];
+
+      const csv = [orderedHeaders]
+        .concat(
+          flattenedRows.map((row) =>
+            orderedHeaders
+              .map((header) => `"${(row[header] ?? '').toString().replace(/"/g, '""')}"`)
+              .join(',')
+          )
+        )
+        .join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -366,8 +595,8 @@
       URL.revokeObjectURL(url);
     };
 
-    const downloadJson = () => {
-      const submissions = getSubmissions();
+    const downloadJson = async () => {
+      const submissions = await getSubmissions();
       if (!submissions.length) {
         alert('No submissions to download.');
         return;
@@ -381,20 +610,113 @@
       URL.revokeObjectURL(url);
     };
 
-    const clearSubmissions = () => {
-      if (confirm('This will delete all stored submissions for this browser. Continue?')) {
-        localStorage.removeItem(STORAGE_KEY);
-        renderTable();
+    const clearSubmissions = async () => {
+      if (!confirm('This will delete Supabase data (if connected) and clear this browser cache. Continue?')) return;
+      if (supabaseEnabled) {
+        try {
+          await supabase.from('submissions').delete().neq('id', '');
+        } catch (error) {
+          alert(`Unable to clear Supabase submissions: ${error.message}`);
+          return;
+        }
       }
+      localStorage.removeItem(STORAGE_KEY);
+      cachedLocalSubmissions = [];
+      renderTable();
     };
 
-    searchInput.addEventListener('input', renderTable);
-    dayFilter.addEventListener('change', renderTable);
-    recommendFilter.addEventListener('change', renderTable);
-    refreshBtn.addEventListener('click', renderTable);
-    exportBtn.addEventListener('click', exportCsv);
-    downloadJsonBtn.addEventListener('click', downloadJson);
-    clearBtn.addEventListener('click', clearSubmissions);
+    const deleteSubmission = async (entryId) => {
+      if (!entryId) return;
+      if (!confirm('Delete this submission? This cannot be undone.')) return;
+
+      if (supabaseEnabled) {
+        try {
+          await supabase.from('submissions').delete().eq('id', entryId);
+        } catch (error) {
+          alert(`Unable to delete from Supabase: ${error.message}`);
+          return;
+        }
+      }
+
+      cachedLocalSubmissions = loadLocalSubmissions().filter((entry) => entry.id !== entryId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedLocalSubmissions));
+      latestDataset = latestDataset.filter((entry) => entry.id !== entryId);
+      renderTable();
+    };
+
+    const closeModal = () => {
+      detailModal.setAttribute('aria-hidden', 'true');
+    };
+
+    const renderDetailSection = (title, data) => {
+      const rows = Object.entries(data)
+        .filter(([, value]) => value !== undefined && value !== null && value !== '')
+        .map(([key, value]) => `<dt>${key}</dt><dd>${value}</dd>`)
+        .join('');
+      if (!rows) return '';
+      return `
+        <div class="detail-card">
+          <h4>${title}</h4>
+          <dl>${rows}</dl>
+        </div>`;
+    };
+
+    const openDetailModal = (entry) => {
+      detailModalTitle.textContent = entry.name || 'Submission Details';
+      detailModalMeta.textContent = `${formatDateTime(entry.submittedAt)} • ${entry.daysAttended || 'Days not specified'}`;
+
+      const summary = {
+        Organization: entry.organization || '—',
+        Role: entry.role || '—',
+        Email: entry.email || '—',
+        'Overall Rating': entry.overall || '—',
+        Recommend: entry.recommend || '—',
+      };
+
+      const payload = {};
+      if (entry.payload && typeof entry.payload === 'object') {
+        Object.entries(entry.payload).forEach(([key, value]) => {
+          payload[key] = stringifyPayloadValue(value);
+        });
+      }
+
+      detailModalContent.innerHTML =
+        renderDetailSection('Summary', summary) +
+        renderDetailSection('Form Responses', payload);
+
+      detailModal.setAttribute('aria-hidden', 'false');
+    };
+
+    tableBody.addEventListener('click', (event) => {
+      const detailButton = event.target.closest('button.detail-button');
+      if (detailButton && detailButton.dataset.entryId) {
+        const entry = latestDataset.find((item) => item.id === detailButton.dataset.entryId);
+        if (entry) {
+          openDetailModal(entry);
+        }
+        return;
+      }
+
+      const deleteButton = event.target.closest('button[data-delete-id]');
+      if (deleteButton) {
+        deleteSubmission(deleteButton.dataset.deleteId);
+      }
+    });
+
+    detailModalClose.addEventListener('click', closeModal);
+    detailModal.addEventListener('click', (event) => {
+      if (event.target === detailModal) {
+        closeModal();
+      }
+    });
+
+    searchInput.addEventListener('input', () => renderTable());
+    dayFilter.addEventListener('change', () => renderTable());
+    recommendFilter.addEventListener('change', () => renderTable());
+    refreshBtn.addEventListener('click', () => renderTable());
+    exportBtn.addEventListener('click', () => exportCsv());
+    downloadJsonBtn.addEventListener('click', () => downloadJson());
+    clearBtn.addEventListener('click', () => clearSubmissions());
     reAuthBtn.addEventListener('click', requireAuth);
 
     requireAuth();
