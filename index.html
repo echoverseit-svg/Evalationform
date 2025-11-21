@@ -655,40 +655,8 @@
       </section>
 
       <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
-        <button type="button" class="ghost-button" id="adminAccess">Inline Admin Panel</button>
         <a class="ghost-button" style="text-decoration:none; display:inline-flex; align-items:center;" href="admin.html">Open Full Admin Dashboard ↗</a>
       </div>
-
-      <section id="adminSection" class="admin-shell" hidden>
-        <h2>Admin Dashboard – Submission Overview</h2>
-        <p style="margin-top: -0.5rem; color: #4f5366;">Data is stored locally in this browser. Export regularly for backup.</p>
-        <div class="admin-controls">
-          <button type="button" id="refreshAdmin">Refresh List</button>
-          <button type="button" id="exportCsv">Export CSV</button>
-          <button type="button" id="clearData" style="border-color: #cc3b3b; color: #cc3b3b;">Clear Stored Submissions</button>
-        </div>
-        <div id="adminStats" style="margin-bottom: 1rem; font-weight: 600; color: var(--ignite-dark);"></div>
-        <div class="admin-table-wrapper">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Organization</th>
-                <th>Role</th>
-                <th>Days Attended</th>
-                <th>Overall Rating</th>
-                <th>Email</th>
-                <th>Submitted</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="adminTableBody">
-              <tr><td colspan="8" style="text-align:center; color:#6d6f7c;">No submissions yet.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
     </main>
   </div>
 
@@ -721,17 +689,7 @@
     const certificateIssued = document.getElementById('certificate-issued');
     const downloadBtn = document.getElementById('downloadCertificate');
     const certificateCard = document.getElementById('certificateCard');
-    const adminAccessBtn = document.getElementById('adminAccess');
-    const adminSection = document.getElementById('adminSection');
-    const adminTableBody = document.getElementById('adminTableBody');
-    const adminStats = document.getElementById('adminStats');
-    const refreshAdminBtn = document.getElementById('refreshAdmin');
-    const exportCsvBtn = document.getElementById('exportCsv');
-    const clearDataBtn = document.getElementById('clearData');
-
-    const ADMIN_CODE = 'ignite2025';
     let cachedSubmissions = [];
-    let latestAdminDataset = [];
 
     const formatDate = (date) => date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -823,46 +781,6 @@
       current.push(record);
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(current));
       cachedSubmissions = current;
-    };
-
-    const clearLocalSubmissions = () => {
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-      cachedSubmissions = [];
-    };
-
-    const renderAdminTable = async () => {
-      if (!adminTableBody) return;
-      adminTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#6d6f7c;">Loading submissions...</td></tr>';
-      adminStats.textContent = supabaseEnabled ? 'Fetching submissions from Supabase...' : 'Data is saved per device via localStorage.';
-
-      const submissions = await getAllSubmissions();
-      latestAdminDataset = submissions;
-      if (!submissions.length) {
-        adminTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#6d6f7c;">No submissions available yet.</td></tr>';
-        adminStats.textContent = supabaseEnabled
-          ? 'No Supabase submissions found. Entries will appear once participants submit the form.'
-          : 'No local submissions stored yet.';
-        return;
-      }
-
-      adminTableBody.innerHTML = submissions.map((entry, index) => `
-          <tr>
-            <td>${index + 1}</td>
-            <td>${entry.name || '—'}</td>
-            <td>${entry.organization || '—'}</td>
-            <td>${entry.role || '—'}</td>
-            <td>${entry.daysAttended || '—'}</td>
-            <td>${entry.overall || '—'}</td>
-            <td>${entry.email || '—'}</td>
-            <td>${formatSubmittedAt(entry.submittedAt)}</td>
-            <td>
-              <button type="button" class="ghost-button admin-delete" data-entry-id="${entry.id}">Delete</button>
-            </td>
-          </tr>`).join('');
-
-      const scores = submissions.map((entry) => Number(entry.overall)).filter((value) => !Number.isNaN(value) && value > 0);
-      const avgOverall = scores.length ? (scores.reduce((sum, value) => sum + value, 0) / scores.length).toFixed(2) : '—';
-      adminStats.textContent = `Total submissions: ${submissions.length}${avgOverall === '—' ? '' : ` • Avg overall rating: ${avgOverall}`}`;
     };
 
     const exportCsv = async () => {
@@ -1005,25 +923,11 @@
         payload: payloadEntries,
       };
 
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Saving locally...';
-      }
-
       saveLocalSubmission(record);
 
       const synced = await syncSubmissionToSupabase(record);
       if (!synced && supabaseEnabled) {
         alert('We could not sync this response to Supabase. The data remains on this device only.');
-      }
-
-      if (!adminSection.hidden) {
-        renderAdminTable();
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Feedback';
       }
 
       form.reset();
@@ -1053,69 +957,6 @@
       }
     });
 
-    const requestAdminAccess = () => {
-      const code = prompt('Enter admin access code:');
-      if (code === ADMIN_CODE) {
-        adminSection.hidden = false;
-        renderAdminTable();
-      } else if (code) {
-        alert('Invalid code. Please try again.');
-      }
-    };
-
-    adminAccessBtn.addEventListener('click', () => {
-      if (adminSection.hidden) {
-        requestAdminAccess();
-      } else {
-        adminSection.hidden = true;
-      }
-    });
-
-    refreshAdminBtn.addEventListener('click', () => {
-      renderAdminTable();
-    });
-    exportCsvBtn.addEventListener('click', () => {
-      exportCsv();
-    });
-    clearDataBtn.addEventListener('click', async () => {
-      if (!confirm('This will delete submissions from Supabase (if available) and clear the local cache for this browser. Continue?')) return;
-      if (supabaseEnabled) {
-        try {
-          await supabase.from('submissions').delete().neq('id', '');
-        } catch (error) {
-          alert(`Unable to clear Supabase submissions: ${error.message}`);
-          return;
-        }
-      }
-      clearLocalSubmissions();
-      renderAdminTable();
-    });
-
-    const deleteSubmission = async (entryId) => {
-      if (!entryId) return;
-      if (!confirm('Delete this submission? This cannot be undone.')) return;
-
-      if (supabaseEnabled) {
-        try {
-          await supabase.from('submissions').delete().eq('id', entryId);
-        } catch (error) {
-          alert(`Unable to delete from Supabase: ${error.message}`);
-          return;
-        }
-      }
-
-      cachedSubmissions = loadLocalSubmissions().filter((entry) => entry.id !== entryId);
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cachedSubmissions));
-
-      latestAdminDataset = latestAdminDataset.filter((entry) => entry.id !== entryId);
-      renderAdminTable();
-    };
-
-    adminTableBody.addEventListener('click', (event) => {
-      const button = event.target.closest('button.admin-delete');
-      if (!button) return;
-      deleteSubmission(button.dataset.entryId);
-    });
   </script>
 </body>
 </html>
