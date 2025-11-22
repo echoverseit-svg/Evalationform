@@ -369,6 +369,27 @@
       box-shadow: 0 16px 32px rgba(11, 73, 193, 0.24);
     }
 
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .validation-hint {
+      background: rgba(1, 200, 239, 0.1);
+      border-left: 4px solid var(--ignite-blue);
+      padding: 0.9rem 1rem;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      color: #0b1b3a;
+      margin: 0;
+    }
+
+    .validation-hint strong {
+      color: var(--ignite-blue);
+    }
+
     @media (max-width: 720px) {
       header, main {
         padding: 2rem 1.25rem;
@@ -448,7 +469,7 @@
           </div>
         </section>
 
-        <section aria-labelledby="session-experience">
+        <section id="session-experience-section" aria-labelledby="session-experience">
           <h2 id="session-experience">B. Session Experience</h2>
           <div class="legend">
             <span>Rating Scale:</span>
@@ -556,8 +577,8 @@
           </table>
         </section>
 
-        <section aria-labelledby="event-summary">
-          <h2 id="event-summary">C. Event Experience Summary</h2>
+        <section id="event-summary" aria-labelledby="event-summary-heading">
+          <h2 id="event-summary-heading">C. Event Experience Summary</h2>
           <p>Please rate the following overall aspects of IGNITE.</p>
           <div class="input-grid">
             <div>
@@ -636,7 +657,10 @@
           </div>
         </section>
 
-        <button type="submit">Submit Feedback</button>
+        <p class="validation-hint">
+          Please complete every rating and feedback question. Type <strong>N/A</strong> if you don't have a specific comment.
+        </p>
+        <button type="submit" disabled>Submit Feedback</button>
       </form>
       <p style="margin-top: 2rem; font-weight: 600; color: var(--ignite-dark);">Thank you for investing your time to help us ignite more ideas in Antique!</p>
 
@@ -710,6 +734,27 @@
     const certificateTemplateImg = document.getElementById('certificateTemplate');
     let cachedSubmissions = [];
     const DEFAULT_SUBMIT_LABEL = submitBtn?.textContent || 'Submit Feedback';
+    const ratingSelects = Array.from(document.querySelectorAll('#session-experience-section select, #event-summary select'));
+    const commentFields = Array.from(document.querySelectorAll('textarea'));
+    const recommendRadios = Array.from(document.querySelectorAll('input[name="recommend"]'));
+    const daysCheckboxes = Array.from(document.querySelectorAll('input[name="days"]'));
+
+    const toggleSubmitAvailability = () => {
+      if (!submitBtn) return;
+      const ratingsComplete = ratingSelects.every((select) => select.value.trim() !== '');
+      const commentsComplete = commentFields.every((textarea) => textarea.value.trim().length > 0);
+      const recommendAnswered = recommendRadios.some((radio) => radio.checked);
+      const daysSelected = daysCheckboxes.some((checkbox) => checkbox.checked);
+
+      submitBtn.disabled = !(ratingsComplete && commentsComplete && recommendAnswered && daysSelected);
+    };
+
+    ratingSelects.forEach((select) => select.addEventListener('change', toggleSubmitAvailability));
+    commentFields.forEach((textarea) => textarea.addEventListener('input', toggleSubmitAvailability));
+    recommendRadios.forEach((radio) => radio.addEventListener('change', toggleSubmitAvailability));
+    daysCheckboxes.forEach((checkbox) => checkbox.addEventListener('change', toggleSubmitAvailability));
+
+    toggleSubmitAvailability();
 
 
     const formatDate = (date) => date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -946,6 +991,7 @@
       }
 
       form.reset();
+      toggleSubmitAvailability();
     });
 
     downloadBtn.addEventListener('click', async () => {
