@@ -469,7 +469,7 @@
           </div>
         </section>
 
-        <section id="session-experience-section" aria-labelledby="session-experience">
+        <section aria-labelledby="session-experience">
           <h2 id="session-experience">B. Session Experience</h2>
           <div class="legend">
             <span>Rating Scale:</span>
@@ -734,7 +734,7 @@
     const certificateTemplateImg = document.getElementById('certificateTemplate');
     let cachedSubmissions = [];
     const DEFAULT_SUBMIT_LABEL = submitBtn?.textContent || 'Submit Feedback';
-    const ratingSelects = Array.from(document.querySelectorAll('#session-experience-section select, #event-summary select'));
+    const ratingSelects = Array.from(document.querySelectorAll('#session-experience select, #event-summary select'));
     const commentFields = Array.from(document.querySelectorAll('textarea'));
     const recommendRadios = Array.from(document.querySelectorAll('input[name="recommend"]'));
     const daysCheckboxes = Array.from(document.querySelectorAll('input[name="days"]'));
