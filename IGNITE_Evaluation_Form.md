@@ -25,7 +25,6 @@
 | Time | Program Segment | Relevance of Content | Speaker Delivery | Engagement Level |
 |------|-----------------|----------------------|------------------|------------------|
 | 7:30 – 9:00 AM | Registration, Networking & Opening Preliminaries (UA Chorale) | 1 2 3 4 5 | 1 2 3 4 5 | 1 2 3 4 5 |
-| 9:00 – 9:30 AM | Welcome Program (JCI Antique Kruhay & dignitaries) | 1 2 3 4 5 | 1 2 3 4 5 | 1 2 3 4 5 |
 | 9:30 – 10:00 AM | *Good Governance as the Engine of Local Innovation* – Hon. Lord Arnel L. Ruanto | 1 2 3 4 5 | 1 2 3 4 5 | 1 2 3 4 5 |
 | 10:00 – 10:30 AM | *Igniting Innovation, Empowering the Next Generation* – Mr. Matthew Cua | 1 2 3 4 5 | 1 2 3 4 5 | 1 2 3 4 5 |
 | 10:30 – 11:50 AM | Moderated Open Forums & Intermission Pieces | 1 2 3 4 5 | 1 2 3 4 5 | 1 2 3 4 5 |

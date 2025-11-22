@@ -228,6 +228,22 @@
       font-weight: 600;
     }
 
+    .faq-box {
+      background: var(--ignite-light);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      line-height: 1.55;
+    }
+
+    .faq-box p {
+      margin: 0 0 0.85rem;
+    }
+
+    .faq-box p:last-child {
+      margin-bottom: 0;
+    }
+
     form {
       display: flex;
       flex-direction: column;
@@ -441,41 +457,40 @@
               </tr>
             </thead>
             <tbody>
-              
               <tr>
                 <td>9:30 – 10:00 AM</td>
                 <td><em>Good Governance as the Engine of Local Innovation</em> – Hon. Lord Arnel L. Ruanto</td>
+                <td><select name="d1_session1_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session1_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+                <td><select name="d1_session1_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
+              </tr>
+              <tr>
+                <td>10:00 – 10:30 AM</td>
+                <td><em>Igniting Innovation, Empowering the Next Generation</em> – Mr. Matthew Cua</td>
                 <td><select name="d1_session2_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
                 <td><select name="d1_session2_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
                 <td><select name="d1_session2_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
               </tr>
               <tr>
-                <td>10:00 – 10:30 AM</td>
-                <td><em>Igniting Innovation, Empowering the Next Generation</em> – Mr. Matthew Cua</td>
+                <td>10:30 – 11:50 AM</td>
+                <td>Moderated Open Forums &amp; Intermission Pieces</td>
                 <td><select name="d1_session3_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
                 <td><select name="d1_session3_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
                 <td><select name="d1_session3_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
               </tr>
               <tr>
-                <td>10:30 – 11:50 AM</td>
-                <td>Moderated Open Forums &amp; Intermission Pieces</td>
+                <td>11:00 – 11:30 AM</td>
+                <td><em>Your Place in the Start-up World</em> – Jose Francis V. Gerona</td>
                 <td><select name="d1_session4_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
                 <td><select name="d1_session4_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
                 <td><select name="d1_session4_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
               </tr>
               <tr>
-                <td>11:00 – 11:30 AM</td>
-                <td><em>Your Place in the Start-up World</em> – Jose Francis V. Gerona</td>
+                <td>1:30 – 2:30 PM</td>
+                <td>Panel: <em>Igniting Ideas, Building Futures</em> (DepEd, DOST, DTI, Phil. Chamber)</td>
                 <td><select name="d1_session5_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
                 <td><select name="d1_session5_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
                 <td><select name="d1_session5_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
-              </tr>
-              <tr>
-                <td>1:30 – 2:30 PM</td>
-                <td>Panel: <em>Igniting Ideas, Building Futures</em> (DepEd, DOST, DTI, Phil. Chamber)</td>
-                <td><select name="d1_session6_relevance"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
-                <td><select name="d1_session6_delivery"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
-                <td><select name="d1_session6_engagement"> <option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></td>
               </tr>
             </tbody>
           </table>
@@ -591,6 +606,16 @@
           <textarea id="improve" name="improve"></textarea>
           <label for="comments">Additional comments, shout-outs, or testimonies:</label>
           <textarea id="comments" name="comments"></textarea>
+        </section>
+
+        <section aria-labelledby="device-faq">
+          <h2 id="device-faq">F. Quick FAQ</h2>
+          <div class="faq-box">
+            <p><strong>Using a mobile device?</strong> Please rotate your phone to landscape mode for the smoothest experience while filling out the evaluation form.</p>
+            <p><strong>Certificate preview showing your name already?</strong> That means you&rsquo;re good—what you see will align once saved.</p>
+            <p><strong>Downloading your certificate?</strong> Switch to landscape mode before saving so the full certificate image captures correctly; staying in portrait can cause mobile download issues.</p>
+            <p><strong>On a laptop or desktop?</strong> You&rsquo;re all set—no extra steps needed.</p>
+          </div>
         </section>
 
         <button type="submit">Submit Feedback</button>
