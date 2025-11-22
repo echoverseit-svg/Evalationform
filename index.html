@@ -612,7 +612,7 @@
           <h2 id="device-faq">F. Quick FAQ</h2>
           <div class="faq-box">
             <p><strong>Using a mobile device?</strong> Please rotate your phone to landscape mode for the smoothest experience while filling out the evaluation form.</p>
-            <p><strong>Certificate preview showing your name already?</strong> That means you&rsquo;re good—what you see will align once saved.</p>
+            <p><strong>Certificate preview looks slightly off?</strong> No worries—the final download aligns everything (including your name) perfectly.</p>
             <p><strong>Downloading your certificate?</strong> Switch to landscape mode before saving so the full certificate image captures correctly; staying in portrait can cause mobile download issues.</p>
             <p><strong>On a laptop or desktop?</strong> You&rsquo;re all set—no extra steps needed.</p>
           </div>
@@ -652,6 +652,15 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.1/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((error) => {
+          console.warn('Service worker registration failed:', error);
+        });
+      });
+    }
+  </script>
   <script>
     const supabase = window.supabaseClient;
     const supabaseEnabled = Boolean(supabase);
