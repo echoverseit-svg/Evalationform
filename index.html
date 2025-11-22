@@ -16,6 +16,12 @@
       --border-color: rgba(11, 73, 193, 0.15);
     }
 
+    .session-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .certificate-shell {
       margin-top: 3rem;
       border: 1px solid var(--border-color);
@@ -299,6 +305,7 @@
       border-collapse: collapse;
       margin-bottom: 1.5rem;
       font-size: 0.92rem;
+      min-width: 560px;
     }
 
     .session-table thead {
@@ -380,6 +387,13 @@
         width: 100%;
       }
     }
+
+    .credits-note {
+      margin-top: 2.5rem;
+      font-size: 0.85rem;
+      color: #5c6278;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -446,6 +460,7 @@
           </div>
 
           <h3>Day 1 – November 21 (Friday)</h3>
+          <div class="session-table-wrapper">
           <table class="session-table">
             <thead>
               <tr>
@@ -494,8 +509,10 @@
               </tr>
             </tbody>
           </table>
+          </div>
 
           <h3>Day 2 – November 22 (Saturday)</h3>
+          <div class="session-table-wrapper">
           <table class="session-table">
             <thead>
               <tr>
@@ -622,6 +639,8 @@
         <button type="submit">Submit Feedback</button>
       </form>
       <p style="margin-top: 2rem; font-weight: 600; color: var(--ignite-dark);">Thank you for investing your time to help us ignite more ideas in Antique!</p>
+
+      <p class="credits-note">Crafted with care by Hanz Theo Loriega / Echoverse IT.</p>
 
       <section id="certificate-section" class="certificate-shell" hidden>
         <h2 style="margin-top: 0;">🎓 Instant Certificate of Participation</h2>
