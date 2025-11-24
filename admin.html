@@ -114,6 +114,140 @@
       color: var(--ignite-dark);
     }
 
+    .analytics-panel {
+      margin: 2.5rem 0 2rem;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 1.5rem;
+      background: #fdfdff;
+    }
+
+    .analytics-panel h2 {
+      margin: 0;
+      color: var(--ignite-dark);
+    }
+
+    .analytics-panel p {
+      margin: 0.35rem 0 0;
+      color: #4f5366;
+    }
+
+    .analytics-grid {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .chart-card {
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1rem;
+      background: #fff;
+      box-shadow: 0 10px 18px rgba(11, 27, 58, 0.06);
+    }
+
+    .chart-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      color: var(--ignite-dark);
+    }
+
+    .chart-card canvas {
+      width: 100%;
+      height: 280px;
+    }
+
+    .analytics-empty {
+      margin: 1rem 0 0;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #4c4f63;
+      font-weight: 500;
+    }
+
+    .feedback-panel {
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 1.75rem;
+      background: #fff;
+      box-shadow: 0 20px 38px rgba(11, 27, 58, 0.08);
+      margin-bottom: 2rem;
+    }
+
+    .feedback-panel h2 {
+      margin: 0;
+      color: var(--ignite-dark);
+    }
+
+    .feedback-panel p {
+      margin: 0.3rem 0 0;
+      color: #4f5366;
+    }
+
+    .feedback-list {
+      margin-top: 1.5rem;
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .feedback-card {
+      border: 1px solid rgba(11, 73, 193, 0.15);
+      border-radius: 16px;
+      padding: 1.2rem 1.4rem;
+      background: #f9fbff;
+    }
+
+    .feedback-card header {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+      font-weight: 600;
+      color: var(--ignite-dark);
+    }
+
+    .feedback-meta {
+      font-size: 0.85rem;
+      color: #4c4f63;
+    }
+
+    .feedback-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .feedback-grid h4 {
+      margin: 0 0 0.4rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #4c4f63;
+    }
+
+    .feedback-grid p,
+    .feedback-grid ul {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #1e2130;
+    }
+
+    .feedback-grid ul {
+      padding-left: 1.1rem;
+    }
+
+    .feedback-empty {
+      margin: 1rem 0 0;
+      padding: 0.9rem 1rem;
+      border-radius: 10px;
+      background: #eef2ff;
+      color: #4c4f63;
+      font-weight: 500;
+    }
+
     .table-wrapper {
       overflow-x: auto;
       border-radius: 14px;
@@ -312,6 +446,9 @@
           <option value="maybe">Maybe</option>
           <option value="not-yet">Not yet</option>
         </select>
+        <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.9rem; color:#4c4f63;">
+          <input type="checkbox" id="feedbackFilter" /> With D &amp; E feedback
+        </label>
       </div>
 
       <div class="stats-grid">
@@ -320,6 +457,37 @@
         <div class="stat-card"><span>Recommend Rate</span><strong id="recommendRate">0%</strong></div>
         <div class="stat-card"><span>Latest Entry</span><strong id="latestEntry">—</strong></div>
       </div>
+
+      <section class="analytics-panel">
+        <div class="analytics-header">
+          <h2>Analytics & Insights</h2>
+          <p id="analyticsStatus">Waiting for data…</p>
+        </div>
+        <p class="analytics-empty" id="analyticsEmpty">Submit at least one response to unlock charts.</p>
+        <div class="analytics-grid" hidden>
+          <div class="chart-card">
+            <h3>Recommendation Breakdown</h3>
+            <canvas id="recommendChart" aria-label="Recommendation breakdown chart" role="img"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Participant Roles</h3>
+            <canvas id="roleChart" aria-label="Role distribution chart" role="img"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Days Attended</h3>
+            <canvas id="attendanceChart" aria-label="Attendance chart" role="img"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="feedback-panel">
+        <div>
+          <h2>Qualitative Feedback</h2>
+          <p>Highlights from Sections D &amp; E (Insights, Collaborations, Likes &amp; Improvements)</p>
+        </div>
+        <p class="feedback-empty" id="feedbackEmpty">No qualitative feedback yet. Encourage attendees to answer Sections D &amp; E.</p>
+        <div class="feedback-list" id="feedbackList" hidden></div>
+      </section>
 
       <div class="table-wrapper">
         <table>
@@ -364,6 +532,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.1/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script>
@@ -393,6 +562,7 @@
     const searchInput = document.getElementById('search');
     const dayFilter = document.getElementById('dayFilter');
     const recommendFilter = document.getElementById('recommendFilter');
+    const feedbackFilter = document.getElementById('feedbackFilter');
     const detailModal = document.getElementById('detailModal');
     const detailModalTitle = document.getElementById('detailModalTitle');
     const detailModalMeta = document.getElementById('detailModalMeta');
@@ -404,6 +574,16 @@
     const downloadJsonBtn = document.getElementById('downloadJson');
     const clearBtn = document.getElementById('clear');
     const reAuthBtn = document.getElementById('reAuth');
+    const analyticsGrid = document.querySelector('.analytics-grid');
+    const analyticsStatus = document.getElementById('analyticsStatus');
+    const analyticsEmptyState = document.getElementById('analyticsEmpty');
+    const recommendChartCanvas = document.getElementById('recommendChart');
+    const roleChartCanvas = document.getElementById('roleChart');
+    const attendanceChartCanvas = document.getElementById('attendanceChart');
+    const feedbackList = document.getElementById('feedbackList');
+    const feedbackEmptyState = document.getElementById('feedbackEmpty');
+
+    const FEEDBACK_KEYS = ['insights', 'collab', 'support', 'liked', 'improve', 'comments'];
 
     const requireAuth = () => {
       const code = prompt('Enter admin access code:');
@@ -413,8 +593,290 @@
       }
     };
 
+    const destroyChart = (chartInstance) => {
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+      return null;
+    };
+
+    const upsertChart = (chartInstance, canvas, config) => {
+      if (!window.Chart || !canvas) {
+        return chartInstance;
+      }
+      if (chartInstance) {
+        chartInstance.data = config.data;
+        chartInstance.options = config.options || chartInstance.options;
+        chartInstance.update();
+        return chartInstance;
+      }
+      return new Chart(canvas, config);
+    };
+
+    const normalizeRole = (value) => (value && value.trim() ? value.trim() : 'Unspecified');
+
+    const updateAnalytics = (entries) => {
+      if (!analyticsEmptyState || !analyticsGrid) return;
+      const hasData = entries.length > 0;
+      analyticsGrid.hidden = !hasData;
+      analyticsEmptyState.hidden = hasData;
+      if (analyticsStatus) {
+        analyticsStatus.textContent = hasData
+          ? (supabaseEnabled ? 'Powered by live Supabase data' : 'Powered by this browser\'s cached data')
+          : 'Waiting for data…';
+      }
+
+      if (!hasData) {
+        recommendChartInstance = destroyChart(recommendChartInstance);
+        roleChartInstance = destroyChart(roleChartInstance);
+        attendanceChartInstance = destroyChart(attendanceChartInstance);
+        return;
+      }
+
+      const recommendCounts = { yes: 0, maybe: 0, 'not-yet': 0, blank: 0 };
+      const roleCounts = {};
+      const attendanceCounts = {
+        'Day 1 only': 0,
+        'Day 2 only': 0,
+        'Day 1 & Day 2': 0,
+        Unspecified: 0,
+      };
+
+      entries.forEach((entry) => {
+        const recommendKey = (entry.recommend || 'blank').toLowerCase();
+        if (recommendCounts[recommendKey] !== undefined) {
+          recommendCounts[recommendKey] += 1;
+        } else {
+          recommendCounts.blank += 1;
+        }
+
+        const roleLabel = normalizeRole(entry.role);
+        roleCounts[roleLabel] = (roleCounts[roleLabel] || 0) + 1;
+
+        const daysRaw = (entry.daysAttended || entry.days || '').toLowerCase();
+        const hasDay1 = daysRaw.includes('day 1');
+        const hasDay2 = daysRaw.includes('day 2');
+        if (!daysRaw) {
+          attendanceCounts.Unspecified += 1;
+        } else if (daysRaw.includes('both') || (hasDay1 && hasDay2)) {
+          attendanceCounts['Day 1 & Day 2'] += 1;
+        } else if (hasDay1) {
+          attendanceCounts['Day 1 only'] += 1;
+        } else if (hasDay2) {
+          attendanceCounts['Day 2 only'] += 1;
+        } else {
+          attendanceCounts.Unspecified += 1;
+        }
+      });
+
+      recommendChartInstance = upsertChart(recommendChartInstance, recommendChartCanvas, {
+        type: 'doughnut',
+        data: {
+          labels: ['Yes', 'Maybe', 'Not yet', 'Unspecified'],
+          datasets: [
+            {
+              data: [
+                recommendCounts.yes,
+                recommendCounts.maybe,
+                recommendCounts['not-yet'],
+                recommendCounts.blank,
+              ],
+              backgroundColor: ['#0b49c1', '#01c8ef', '#ffc857', '#d1d5db'],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom' },
+          },
+        },
+      });
+
+      const sortedRoles = Object.entries(roleCounts).sort((a, b) => b[1] - a[1]);
+      const topRoleLabels = [];
+      const topRoleValues = [];
+      let otherRoleTotal = 0;
+      sortedRoles.forEach(([label, count], index) => {
+        if (index < 5) {
+          topRoleLabels.push(label);
+          topRoleValues.push(count);
+        } else {
+          otherRoleTotal += count;
+        }
+      });
+      if (otherRoleTotal) {
+        topRoleLabels.push('Others');
+        topRoleValues.push(otherRoleTotal);
+      }
+
+      roleChartInstance = upsertChart(roleChartInstance, roleChartCanvas, {
+        type: 'bar',
+        data: {
+          labels: topRoleLabels,
+          datasets: [
+            {
+              label: 'Participants',
+              data: topRoleValues,
+              backgroundColor: '#0b49c1',
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0 },
+            },
+          },
+        },
+      });
+
+      attendanceChartInstance = upsertChart(attendanceChartInstance, attendanceChartCanvas, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(attendanceCounts),
+          datasets: [
+            {
+              label: 'Responses',
+              data: Object.values(attendanceCounts),
+              backgroundColor: ['#0b49c1', '#01c8ef', '#13c59d', '#d1d5db'],
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { precision: 0 },
+            },
+          },
+        },
+      });
+    };
+
+    const escapeHtml = (value) =>
+      value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    const asArray = (value) => {
+      if (!value && value !== 0) return [];
+      return Array.isArray(value) ? value : [value];
+    };
+
+    const normalizeText = (value) => {
+      if (value === undefined || value === null) return '';
+      return value.toString().trim();
+    };
+
+    const entryHasQualitativeFeedback = (entry) => {
+      const payload = entry.payload || {};
+      return FEEDBACK_KEYS.some((key) => {
+        const value = payload[key];
+        if (Array.isArray(value)) {
+          return value.some((item) => normalizeText(item));
+        }
+        return Boolean(normalizeText(value));
+      });
+    };
+
+    const renderFeedback = (entries) => {
+      if (!feedbackList || !feedbackEmptyState) return;
+      const enriched = entries
+        .map((entry) => {
+          const payload = entry.payload || {};
+          const insights = asArray(payload.insights).map(normalizeText).filter(Boolean);
+          const collab = normalizeText(payload.collab);
+          const support = normalizeText(payload.support);
+          const liked = normalizeText(payload.liked);
+          const improve = normalizeText(payload.improve);
+          const comments = normalizeText(payload.comments);
+          const hasContent = insights.length || collab || support || liked || improve || comments;
+          return {
+            entry,
+            insights,
+            collab,
+            support,
+            liked,
+            improve,
+            comments,
+            hasContent,
+          };
+        })
+        .filter((item) => item.hasContent)
+        .sort((a, b) => {
+          const aTime = new Date(a.entry.submittedAt || 0).getTime();
+          const bTime = new Date(b.entry.submittedAt || 0).getTime();
+          return bTime - aTime;
+        })
+        .slice(0, 8);
+
+      feedbackList.hidden = !enriched.length;
+      feedbackEmptyState.hidden = !!enriched.length;
+
+      if (!enriched.length) {
+        feedbackList.innerHTML = '';
+        return;
+      }
+
+      const formatInsights = (items) => {
+        if (!items.length) return '<p style="color:#7c7f91;">No insights shared.</p>';
+        return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+      };
+
+      const formatBlock = (label, value) => `
+        <div>
+          <h4>${label}</h4>
+          <p>${value ? escapeHtml(value) : '<span style="color:#7c7f91;">No response</span>'}</p>
+        </div>
+      `;
+
+      feedbackList.innerHTML = enriched
+        .map((item) => {
+          const name = item.entry.name || 'Anonymous participant';
+          const org = item.entry.organization || '';
+          const metaPieces = [org, item.entry.role].filter(Boolean).join(' • ');
+          const timestamp = item.entry.submittedAt ? formatDateTime(item.entry.submittedAt) : 'Date unknown';
+          return `
+            <article class="feedback-card">
+              <header>
+                <div>${escapeHtml(name)}</div>
+                <div class="feedback-meta">${escapeHtml(timestamp)}${metaPieces ? ` • ${escapeHtml(metaPieces)}` : ''}</div>
+              </header>
+              <div class="feedback-grid">
+                <div>
+                  <h4>Insights to apply</h4>
+                  ${formatInsights(item.insights)}
+                </div>
+                ${formatBlock('Collaboration leads', item.collab)}
+                ${formatBlock('Support requested', item.support)}
+                ${formatBlock('What they loved', item.liked)}
+                ${formatBlock('Areas to improve', item.improve)}
+                ${formatBlock('Comments & shout-outs', item.comments)}
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+    };
+
     let cachedLocalSubmissions = [];
     let latestDataset = [];
+    let recommendChartInstance = null;
+    let roleChartInstance = null;
+    let attendanceChartInstance = null;
 
     const loadLocalSubmissions = () => {
       if (cachedLocalSubmissions.length) return cachedLocalSubmissions;
@@ -507,6 +969,7 @@
       const query = searchInput.value.trim().toLowerCase();
       const day = dayFilter.value;
       const recommend = recommendFilter.value;
+      const requireFeedback = feedbackFilter?.checked;
 
       return entries.filter((entry) => {
         const matchesQuery = !query || Object.values(entry).some((value) =>
@@ -516,8 +979,9 @@
         const entryDays = entry.daysAttended || entry.days || '';
         const matchesDay = !day || entryDays.includes(day);
         const matchesRecommend = !recommend || entry.recommend === recommend;
+        const matchesFeedback = !requireFeedback || entryHasQualitativeFeedback(entry);
 
-        return matchesQuery && matchesDay && matchesRecommend;
+        return matchesQuery && matchesDay && matchesRecommend && matchesFeedback;
       });
     };
 
@@ -557,6 +1021,8 @@
       const recommendYes = submissions.filter((entry) => entry.recommend === 'yes').length;
       recommendRateEl.textContent = submissions.length ? `${Math.round((recommendYes / submissions.length) * 100)}%` : '0%';
       latestEntryEl.textContent = submissions.length ? formatDateTime(submissions[submissions.length - 1].submittedAt) : '—';
+
+      updateAnalytics(submissions);
     };
 
     const exportCsv = async () => {
@@ -713,6 +1179,7 @@
     searchInput.addEventListener('input', () => renderTable());
     dayFilter.addEventListener('change', () => renderTable());
     recommendFilter.addEventListener('change', () => renderTable());
+    feedbackFilter.addEventListener('change', () => renderTable());
     refreshBtn.addEventListener('click', () => renderTable());
     exportBtn.addEventListener('click', () => exportCsv());
     downloadJsonBtn.addEventListener('click', () => downloadJson());
