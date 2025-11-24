@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ignite-eval-cache-v1';
+const CACHE_NAME = 'ignite-eval-cache-v2';
 const OFFLINE_ASSETS = [
   '/',
   '/index.html',
@@ -33,16 +33,50 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((response) => {
-        const cloned = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cloned));
-        return response;
-      }).catch(() => caches.match('/index.html'));
-    })
-  );
+  const { request } = event;
+  const url = new URL(request.url);
+  const isDocumentRequest = request.mode === 'navigate' || request.destination === 'document';
+  const isSupabaseConfig = url.pathname.endsWith('/supabase-config.js');
+
+  if (isDocumentRequest) {
+    event.respondWith(networkFirst(request, '/index.html'));
+    return;
+  }
+
+  if (isSupabaseConfig) {
+    event.respondWith(networkFirst(request, null));
+    return;
+  }
+
+  event.respondWith(cacheFirst(request));
 });
+
+const networkFirst = (request, fallbackPath) => {
+  return fetch(request)
+    .then((response) => {
+      const cloned = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
+      return response;
+    })
+    .catch(() => {
+      if (!fallbackPath) {
+        return caches.match(request);
+      }
+      return caches.match(request).then((cached) => cached || caches.match(fallbackPath));
+    });
+};
+
+const cacheFirst = (request) => {
+  return caches.match(request).then((cachedResponse) => {
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    return fetch(request)
+      .then((response) => {
+        const cloned = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
+        return response;
+      })
+      .catch(() => undefined);
+  });
+};
