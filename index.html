@@ -178,6 +178,70 @@
       overflow: hidden;
     }
 
+    .notice-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 27, 58, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 999;
+      opacity: 1;
+      transition: opacity 0.25s ease;
+    }
+
+    .notice-backdrop.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .notice-modal {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 480px;
+      width: min(90vw, 480px);
+      text-align: center;
+      box-shadow: 0 25px 65px rgba(11, 27, 58, 0.25);
+    }
+
+    .notice-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.15rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: rgba(1, 200, 239, 0.15);
+      color: var(--ignite-blue);
+      margin-bottom: 0.75rem;
+    }
+
+    .notice-modal h2 {
+      margin: 0 0 0.75rem;
+      color: var(--ignite-dark);
+    }
+
+    .notice-modal p {
+      margin: 0 0 1.25rem;
+      color: #4f5366;
+      line-height: 1.5;
+    }
+
+    .notice-modal button {
+      background: linear-gradient(120deg, var(--ignite-blue), var(--ignite-cyan));
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.85rem 2.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(11, 73, 193, 0.2);
+    }
+
     header {
       background: radial-gradient(circle at top left, rgba(1, 200, 239, 0.4), transparent 60%),
         linear-gradient(120deg, var(--ignite-blue), var(--ignite-dark));
@@ -418,6 +482,17 @@
   </style>
 </head>
 <body>
+  <div id="formClosedNotice" class="notice-backdrop" role="dialog" aria-modal="true" aria-labelledby="formClosedTitle">
+    <div class="notice-modal">
+      <span class="notice-chip">NOTICE</span>
+      <h2 id="formClosedTitle">IGNITE Evaluation Form is Closed</h2>
+      <p>
+        Thank you for your enthusiasm! We&rsquo;re no longer accepting responses for the 2025 IGNITE Mechanics Evaluation Form.
+        Please reach out to JCI Antique Kruhay for anything urgent.
+      </p>
+      <button type="button" id="noticeAcknowledge">Got it</button>
+    </div>
+  </div>
   <div class="page">
     <header>
       <p>November 21-22, 2025 • University of Antique, Main Campus • Sibalom, Antique</p>
@@ -708,6 +783,7 @@
   <script>
     const supabase = window.supabaseClient;
     const supabaseEnabled = Boolean(supabase);
+    const FORM_CLOSED = true;
     const LOCAL_STORAGE_KEY = 'igniteSubmissions';
     const BASE_EXPORT_HEADERS = [
       'submission_id',
@@ -738,9 +814,16 @@
     const commentFields = Array.from(document.querySelectorAll('textarea'));
     const recommendRadios = Array.from(document.querySelectorAll('input[name="recommend"]'));
     const daysCheckboxes = Array.from(document.querySelectorAll('input[name="days"]'));
+    const noticeBackdrop = document.getElementById('formClosedNotice');
+    const noticeDismissBtn = document.getElementById('noticeAcknowledge');
 
     const toggleSubmitAvailability = () => {
       if (!submitBtn) return;
+      if (FORM_CLOSED) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Form Closed';
+        return;
+      }
       const ratingsComplete = ratingSelects.every((select) => select.value.trim() !== '');
       const commentsComplete = commentFields.every((textarea) => textarea.value.trim().length > 0);
       const recommendAnswered = recommendRadios.some((radio) => radio.checked);
@@ -755,6 +838,24 @@
     daysCheckboxes.forEach((checkbox) => checkbox.addEventListener('change', toggleSubmitAvailability));
 
     toggleSubmitAvailability();
+
+    const enforceFormClosedState = () => {
+      if (!FORM_CLOSED || !form) return;
+      form.setAttribute('aria-disabled', 'true');
+      Array.from(form.elements).forEach((element) => {
+        if (typeof element.disabled !== 'undefined') {
+          element.disabled = true;
+        }
+      });
+      submitBtn.textContent = 'Form Closed';
+      submitBtn.disabled = true;
+    };
+
+    enforceFormClosedState();
+
+    noticeDismissBtn?.addEventListener('click', () => {
+      noticeBackdrop?.classList.add('hidden');
+    });
 
 
     const formatDate = (date) => date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -934,6 +1035,10 @@
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
+      if (FORM_CLOSED) {
+        alert('This form is currently closed and no longer accepting submissions.');
+        return;
+      }
       const name = document.getElementById('name').value.trim();
       const organization = document.getElementById('organization').value.trim();
       const daysSelected = Array.from(document.querySelectorAll('input[name="days"]:checked')).map((box) => box.value);
