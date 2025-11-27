@@ -242,6 +242,37 @@
       box-shadow: 0 12px 24px rgba(11, 73, 193, 0.2);
     }
 
+    .notice-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .notice-modal .secondary-action {
+      background: transparent;
+      color: var(--ignite-blue);
+      border: 2px solid rgba(11, 73, 193, 0.25);
+      box-shadow: none;
+    }
+
+    .certificate-access-card {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      background: rgba(1, 200, 239, 0.08);
+    }
+
+    .certificate-access-card h3 {
+      margin: 0 0 0.5rem;
+      color: var(--ignite-dark);
+    }
+
+    .certificate-access-card p {
+      margin: 0 0 1rem;
+      color: #4f5366;
+    }
+
     header {
       background: radial-gradient(circle at top left, rgba(1, 200, 239, 0.4), transparent 60%),
         linear-gradient(120deg, var(--ignite-blue), var(--ignite-dark));
@@ -490,7 +521,10 @@
         Thank you for your enthusiasm! We&rsquo;re no longer accepting responses for the 2025 IGNITE Mechanics Evaluation Form.
         Please reach out to JCI Antique Kruhay for anything urgent.
       </p>
-      <button type="button" id="noticeAcknowledge">Got it</button>
+      <div class="notice-actions">
+        <button type="button" id="noticeAcknowledge">Got it</button>
+        <button type="button" class="secondary-action" id="noticeAccessCodeBtn">Enter Access Code</button>
+      </div>
     </div>
   </div>
   <div class="page">
@@ -729,6 +763,7 @@
             <p><strong>Downloading your certificate?</strong> Switch to landscape mode before saving so the full certificate image captures correctly; staying in portrait can cause mobile download issues.</p>
             <p><strong>Need to fill this out with spotty internet?</strong> We cache the page for you, so it stays accessible offline after your first visit—just reload and keep going.</p>
             <p><strong>On a laptop or desktop?</strong> You&rsquo;re all set—no extra steps needed.</p>
+            <p><strong>Need your certificate even if the form is closed?</strong> Tap any “Enter Access Code” button on the page and provide the code shared by the organizers to temporarily unlock certificate generation.</p>
           </div>
         </section>
 
@@ -740,6 +775,12 @@
       <p style="margin-top: 2rem; font-weight: 600; color: var(--ignite-dark);">Thank you for investing your time to help us ignite more ideas in Antique!</p>
 
       <p class="credits-note">Crafted with care by Hanz Theo Loriega / Echoverse IT.</p>
+
+      <section class="certificate-access-card" aria-live="polite">
+        <h3>Need to download your certificate?</h3>
+        <p>If you already submitted feedback during the event, you can still generate the certificate by entering the access code shared by the organizers.</p>
+        <button type="button" class="ghost-button" id="certificateAccessBtn">Enter Access Code</button>
+      </section>
 
       <section id="certificate-section" class="certificate-shell" hidden>
         <h2 style="margin-top: 0;">🎓 Instant Certificate of Participation</h2>
@@ -784,6 +825,7 @@
     const supabase = window.supabaseClient;
     const supabaseEnabled = Boolean(supabase);
     const FORM_CLOSED = true;
+    const CERTIFICATE_ACCESS_CODE = 'igniteCERT2025';
     const LOCAL_STORAGE_KEY = 'igniteSubmissions';
     const BASE_EXPORT_HEADERS = [
       'submission_id',
@@ -816,14 +858,29 @@
     const daysCheckboxes = Array.from(document.querySelectorAll('input[name="days"]'));
     const noticeBackdrop = document.getElementById('formClosedNotice');
     const noticeDismissBtn = document.getElementById('noticeAcknowledge');
+    const noticeAccessBtn = document.getElementById('noticeAccessCodeBtn');
+    const certificateAccessBtn = document.getElementById('certificateAccessBtn');
+    let formUnlocked = false;
+
+    const isFormLocked = () => FORM_CLOSED && !formUnlocked;
+
+    const setFormElementsDisabled = (disabled) => {
+      if (!form) return;
+      Array.from(form.elements).forEach((element) => {
+        if (typeof element.disabled === 'boolean') {
+          element.disabled = disabled;
+        }
+      });
+    };
 
     const toggleSubmitAvailability = () => {
       if (!submitBtn) return;
-      if (FORM_CLOSED) {
+      if (isFormLocked()) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Form Closed';
         return;
       }
+      submitBtn.textContent = DEFAULT_SUBMIT_LABEL;
       const ratingsComplete = ratingSelects.every((select) => select.value.trim() !== '');
       const commentsComplete = commentFields.every((textarea) => textarea.value.trim().length > 0);
       const recommendAnswered = recommendRadios.some((radio) => radio.checked);
@@ -840,15 +897,18 @@
     toggleSubmitAvailability();
 
     const enforceFormClosedState = () => {
-      if (!FORM_CLOSED || !form) return;
-      form.setAttribute('aria-disabled', 'true');
-      Array.from(form.elements).forEach((element) => {
-        if (typeof element.disabled !== 'undefined') {
-          element.disabled = true;
-        }
-      });
-      submitBtn.textContent = 'Form Closed';
-      submitBtn.disabled = true;
+      if (!form) return;
+      if (isFormLocked()) {
+        form.setAttribute('aria-disabled', 'true');
+        setFormElementsDisabled(true);
+        submitBtn.textContent = 'Form Closed';
+        submitBtn.disabled = true;
+      } else {
+        form.removeAttribute('aria-disabled');
+        setFormElementsDisabled(false);
+        submitBtn.textContent = DEFAULT_SUBMIT_LABEL;
+        toggleSubmitAvailability();
+      }
     };
 
     enforceFormClosedState();
@@ -856,6 +916,22 @@
     noticeDismissBtn?.addEventListener('click', () => {
       noticeBackdrop?.classList.add('hidden');
     });
+
+    const promptForCertificateAccess = () => {
+      const code = prompt('Enter the certificate access code:');
+      if (!code) return;
+      if (code.trim().toLowerCase() === CERTIFICATE_ACCESS_CODE.toLowerCase()) {
+        formUnlocked = true;
+        enforceFormClosedState();
+        noticeBackdrop?.classList.add('hidden');
+        alert('Access granted. You can now complete the form to regenerate your certificate.');
+      } else {
+        alert('Invalid access code. Please try again or contact the organizers.');
+      }
+    };
+
+    noticeAccessBtn?.addEventListener('click', promptForCertificateAccess);
+    certificateAccessBtn?.addEventListener('click', promptForCertificateAccess);
 
 
     const formatDate = (date) => date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -1035,7 +1111,7 @@
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (FORM_CLOSED) {
+      if (isFormLocked()) {
         alert('This form is currently closed and no longer accepting submissions.');
         return;
       }
